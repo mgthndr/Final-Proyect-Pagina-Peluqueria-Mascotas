@@ -53,6 +53,7 @@
 ### 👤 **Perfil de Usuario**
 
 * Roles dinámicos (guest / cliente / admin)
+* La contraseña del perfil de Admin es: admin123 (se puede editar)
 * Avatar
 * Panel emergente
 
