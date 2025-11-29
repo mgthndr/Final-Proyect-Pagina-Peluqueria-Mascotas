@@ -564,11 +564,8 @@ h1, h2, h3, h4{ font-weight:800 !important; }
 </style>
 </head>
 <body>
-<div class="videoBackground" id="videoBackground">
-  <video autoplay muted loop playsinline preload="auto" id="bgVideo">
-    <source src="Videos/bg.mp4" type="video/mp4">
-    
-  </video>
+<div class="videoBackground" id="videoBackground" aria-hidden="true">
+  <video autoplay muted loop playsinline preload="auto" id="bgVideo"></video>
 </div>
 
 <header>
@@ -1180,6 +1177,9 @@ h1, h2, h3, h4{ font-weight:800 !important; }
 </footer>
 
 <script>
+
+// Fondo con animación difuminada: no se requiere URL de video
+
 /* Helpers */
 function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
 function load(k,def){const t=localStorage.getItem(k);return t?JSON.parse(t):def}
@@ -1209,13 +1209,15 @@ function showSection(id){
   if(id==='about') document.getElementById('nav-about').classList.add('active');
   if(id==='shop') openCartPanel();
   
-  // Mostrar/ocultar video en home, about (nosotros) y appointments (citas)
-  const videoBg = document.getElementById('videoBackground');
-  if(id === 'home' || id === 'about' || id === 'appointments'){
-    videoBg.style.display = 'block';
-  } else {
-    videoBg.style.display = 'none';
-  }
+    // Mostrar/ocultar video en home, about (nosotros) y appointments (citas)
+    const videoBg = document.getElementById('videoBackground');
+    if(videoBg){
+      if(id === 'home' || id === 'about' || id === 'appointments'){
+        videoBg.style.display = 'block';
+      } else {
+        videoBg.style.display = 'none';
+      }
+    }
 }
 
 /* Cart toggle */
@@ -1352,7 +1354,21 @@ const PRODUCTS = [
   {id:'p22',cat:'Accesorios',name:'Gafas de sol mascota',price:14000,discount:0,img:'https://m.media-amazon.com/images/I/71cIynM-y7S.jpg'},
   {id:'p23',cat:'Higiene',name:'Spray desodorante',price:12000,discount:30,img:'https://http2.mlstatic.com/D_Q_NP_773697-MLA95508870107_102025-O.webp'},
   {id:'p24',cat:'Accesorios',name:'Identificador con placa',price:9000,discount:0,img:'https://http2.mlstatic.com/D_NQ_NP_904168-MCO94037454016_102025-O.webp'},
-];
+  {id:'p25',cat:'Alimentos',name:'Latas gourmet para perro',price:18000,discount:15,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjkdFM02a70IdADMluV26utEilfry84-8mJw&s'},
+  {id:'p26',cat:'Alimentos',name:'Snack de pollo deshidratado',price:15000,discount:0,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQc7PvfQsAGCGBY1wztS0E1eYHC1aMwNvIvSA&s'},
+  {id:'p27',cat:'Alimentos',name:'Hueso prensado grande',price:12000,discount:10,img:'https://m.media-amazon.com/images/I/6176dKk0L7L._AC_UF894,1000_QL80_.jpg'},
+  {id:'p28',cat:'Accesorios',name:'Arnés acolchado',price:54000,discount:20,img:'https://petopet.com.co/cdn/shop/products/PEX-_arnes_rojo_2_1024x1024.jpg?v=1628181937'},
+  {id:'p29',cat:'Accesorios',name:'Bozal ajustable',price:28000,discount:0,img:'https://m.media-amazon.com/images/I/71e2kiZNOrL._AC_UF1000,1000_QL80_.jpg'},
+  {id:'p30',cat:'Accesorios',name:'Transportadora rígida',price:95000,discount:15,img:'https://http2.mlstatic.com/D_NQ_NP_630551-MLU70777810440_082023-O.webp'},
+  {id:'p31',cat:'Juguetes',name:'Frisbee resistente',price:16000,discount:0,img:'https://http2.mlstatic.com/D_NQ_NP_740575-MCO86726047299_062025-O.webp'},
+  {id:'p32',cat:'Juguetes',name:'Pelota de tenis XL',price:12000,discount:0,img:'https://http2.mlstatic.com/D_NQ_NP_833277-MCO75137331621_032024-O.webp'},
+  {id:'p33',cat:'Juguetes',name:'Juguete masticable goma',price:18000,discount:25,img:'https://tu360compras.bancolombia.com/329107-medium_default/juguete-masticable-razas-peque%C3%B1as-goma-at%C3%B3xica-quita-sarro.jpg'},
+  {id:'p34',cat:'Higiene',name:'Toalla microfibra secado rápido',price:26000,discount:0,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkoNfPbf5oJdzTH0MQdd5lm9xLi4bfasDDDA&s'},
+  {id:'p35',cat:'Higiene',name:'Limpiador de oídos',price:22000,discount:10,img:'https://d23qt3x1ychzdy.cloudfront.net/dev_images_products/ea7452380e33234fb36dba8323bcd675_1705512985.jpg'},
+  {id:'p36',cat:'Higiene',name:'Pasta dental para mascotas',price:19000,discount:0,img:'https://http2.mlstatic.com/D_Q_NP_668961-MLU71335799125_082023-O.webp'},
+  {id:'p37',cat:'Ropa',name:'Abrigo impermeable',price:78000,discount:30,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKVeefLNDQ2iCrFOeGHpWEDBM0BSvmvLtEeg&s'},
+  {id:'p38',cat:'Ropa',name:'Pañuelo bandana',price:12000,discount:0,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZ6Zp5Bso5jBQ7CbjsZTwu6QmCq3YCKPCNNA&s'},
+  ];
 
 let cart = load('mp_cart',{}); // { productId: qty }
 
@@ -1364,43 +1380,48 @@ function finalPrice(prod){
 
 /* Render categories */
 let currentCat = 'Todos';
+function makeCatButton(label){
+  const btn = document.createElement('button');
+  btn.textContent = label;
+  btn.onclick = ()=>{ currentCat = label; renderProducts(); renderCategories(); };
+  const active = label===currentCat;
+  btn.style.background = active ? 'linear-gradient(90deg,#cda15d,#edd3a0)' : '#fff';
+  btn.style.color = active ? '#1f1a12' : '#3b2b2b';
+  btn.style.border = '1.5px solid ' + (active ? '#cda15d' : '#e6e1d3');
+  btn.style.borderRadius = '8px';
+  btn.style.padding = '8px 18px';
+  btn.style.fontWeight = '700';
+  btn.style.fontFamily = '"Poppins",sans-serif';
+  btn.style.fontSize = '15px';
+  btn.style.marginRight = '8px';
+  btn.style.cursor = 'pointer';
+  btn.style.transition = 'all .18s cubic-bezier(.2,.9,.2,1)';
+  btn.onmouseover = ()=>{
+    if(!active){
+      btn.style.background='linear-gradient(90deg,#cda15d,#edd3a0)';
+      btn.style.borderColor='#cda15d';
+      btn.style.color='#1f1a12';
+      btn.style.boxShadow='0 4px 12px var(--shadow)';
+    }
+  };
+  btn.onmouseout = ()=>{
+    if(!active){
+      btn.style.background='#fff';
+      btn.style.borderColor='#e6e1d3';
+      btn.style.color='#3b2b2b';
+      btn.style.boxShadow='none';
+    }
+  };
+  return btn;
+}
+
 function renderCategories(){
   const bar = document.getElementById('catButtons');
   const cats = ['Todos', ...Array.from(new Set(PRODUCTS.map(p=>p.cat)))];
   bar.innerHTML = '';
-  cats.forEach(c=>{
-    const btn = document.createElement('button');
-    btn.textContent = c;
-    btn.onclick = ()=>{ currentCat = c; renderProducts(); renderCategories(); };
-    btn.style.background = c===currentCat ? 'linear-gradient(90deg,#cda15d,#edd3a0)' : '#fff';
-    btn.style.color = c===currentCat ? '#1f1a12' : '#3b2b2b';
-    btn.style.border = '1.5px solid ' + (c===currentCat ? '#cda15d' : '#e6e1d3');
-    btn.style.borderRadius = '8px';
-    btn.style.padding = '8px 18px';
-    btn.style.fontWeight = '700';
-    btn.style.fontFamily = '"Poppins",sans-serif';
-    btn.style.fontSize = '15px';
-    btn.style.marginRight = '8px';
-    btn.style.cursor = 'pointer';
-    btn.style.transition = 'all .18s cubic-bezier(.2,.9,.2,1)';
-    btn.onmouseover = ()=>{
-      if(c!==currentCat){
-        btn.style.background='linear-gradient(90deg,#cda15d,#edd3a0)';
-        btn.style.borderColor='#cda15d';
-        btn.style.color='#1f1a12';
-        btn.style.boxShadow='0 4px 12px var(--shadow)';
-      }
-    };
-    btn.onmouseout = ()=>{
-      if(c!==currentCat){
-        btn.style.background='#fff';
-        btn.style.borderColor='#e6e1d3';
-        btn.style.color='#3b2b2b';
-        btn.style.boxShadow='none';
-      }
-    };
-    bar.appendChild(btn);
-  });
+  // Insert "Hot topic" first
+  bar.appendChild(makeCatButton('🔥 Hot topic'));
+  cats.forEach(c=>{ bar.appendChild(makeCatButton(c)); });
 }
 
 /* Render product cards con descuentos */
@@ -1423,7 +1444,10 @@ function renderProducts(){
     }
   }
   grid.innerHTML = '';
-  let visible = PRODUCTS.filter(p => currentCat === 'Todos' || p.cat === currentCat);
+  let visible = PRODUCTS.filter(p => {
+    if(currentCat === '🔥 Hot topic') return IS_POPULAR(p);
+    return currentCat === 'Todos' || p.cat === currentCat;
+  });
   if(searchTerm){
     visible = visible.filter(p =>
       p.name.toLowerCase().includes(searchTerm) ||
@@ -1754,13 +1778,17 @@ window.toggleCartExpand = toggleCartExpand;
 
 
 // Configurar velocidad del video (0.7 = 70% velocidad normal, más lento)
-const bgVideo = document.getElementById('bgVideo');
-if(bgVideo){
-  bgVideo.playbackRate = 0.7;
-  bgVideo.play().catch(()=> {
-    bgVideo.muted = true;
-    bgVideo.play();
+// Inicializar video de fondo desde carpeta local
+const bgVideoEl = document.getElementById('bgVideo');
+if(bgVideoEl){
+  bgVideoEl.src = 'Videos/bg.mp4';
+  bgVideoEl.playbackRate = 0.7;
+  bgVideoEl.play().catch(()=>{
+    bgVideoEl.muted = true;
+    bgVideoEl.play().catch(()=>{});
   });
+  const tryPlay = ()=>{ bgVideoEl.play().catch(()=>{}); };
+  document.addEventListener('click', tryPlay, { once:true });
 }
 
 /* Responsive cart: hide on small screens */
