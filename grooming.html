@@ -1,0 +1,2496 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Maison Paws - Grooming & Boutique</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+.profile-icon{
+  position:fixed !important; right:26px; top:18px; z-index:9999; /* fijado sobre cualquier frame */
+  background:rgba(255,255,255,0.98); border-radius:12px; padding:8px 10px;
+  box-shadow:0 6px 18px var(--shadow); display:flex; align-items:center; gap:10px;
+  cursor:pointer; border:1px solid #f1e9db;
+}
+.avatar{
+  width:26px; height:26px; border-radius:50%;
+  background:#2b2b2b; color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700;
+}
+.roleBadge{
+  font-size:11px; padding:2px 6px; border-radius:999px; color:#fff;
+  background:#7c8; margin-left:6px;
+}
+.roleBadge.admin{ background:#d66; }
+.profilePanel{
+  position:fixed; right:18px; top:70px; z-index:13000; /* por encima de cualquier frame */
+  width:300px; border-radius:12px; padding:12px;
+  background:#fff; border:1px solid #f3efe7; box-shadow:0 10px 30px var(--shadow);
+  display:none;
+}
+.profilePanel .profileHeader{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+.profilePanel .profileAvatarLg{ width:66px; height:66px; border-radius:50%; border:2px solid #eee; object-fit:cover; box-shadow:0 4px 12px var(--shadow) }
+.profilePanel .profileName{ font-family:'Playfair Display',serif; font-size:16px; font-weight:800; color:#1b1b1b; text-align:center }
+.profilePanel .profileRole{ font-style:italic; color:#6b6b6b; font-size:12px; text-align:center }
+.profilePanel .profileMeta{ display:grid; grid-template-columns:1fr; gap:6px; margin-top:8px }
+.profilePanel .metaRow{ display:flex; justify-content:space-between; font-size:12px; color:#555 }
+.profilePanel h4{ margin:0 0 6px; }
+.profileRow{ display:flex; justify-content:space-between; align-items:center; margin:6px 0; }
+.logoutBtn{ background:#2b2b2b; color:#fff; border:0; padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:700; }
+  .loginBtn{ background:var(--btn-color); color:#fff; border:0; padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:700; }
+  .saveProductBtn{ background:linear-gradient(90deg,#10b981,#34d399) !important; border:1.5px solid #10b981 !important; color:#0f1a12 !important; font-weight:800 !important; }
+  .saveProductBtn:hover{ filter:brightness(0.97) }/* FAB admin (botón +) */
+.adminFab{
+  position:fixed;
+  right:26px; bottom:26px;
+  width:35px; height:35px; border-radius:50%;
+  display:none; /* solo visible si admin */
+  align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#10b981,#34d399); color:#fff; font-weight:900; font-size:25px;
+  box-shadow:0 10px 30px var(--shadow);
+  border:none; cursor:pointer; z-index:140;
+}
+.adminFab:hover{ filter:brightness(0.95) }
+
+/* Modal admin para añadir producto */
+.adminModalBack{
+  position:fixed; inset:0; background:rgba(0,0,0,0.35);
+  display:none; align-items:center; justify-content:center; z-index:320; /* AUMENTADO de 150 a 320 */
+}
+
+/* ...existing code... */
+  .adminGrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .adminGrid .full{ grid-column:1 / -1 }
+  .adminActions{ display:flex; gap:8px; justify-content:flex-end; margin-top:10px }
+  :root{
+    --bg:#ffffff;
+    --muted:#7b7b7b;
+    --accent:#cda15d;
+    --accent-2:#f0e6d8;
+    --card:#ffffff;
+    --shadow: rgba(25,25,25,0.06);
+    --btn-color:#cf7a60;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:"Poppins",system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    background:linear-gradient(180deg,var(--bg) 0%, #fbfbfb 100%);color:#111;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  }
+
+  header{display:flex;align-items:center;justify-content:space-between;padding:18px 26px;border-bottom:1px solid #f2efe9;position:sticky;top:0;background:#fff;z-index:12000}
+  .brand {display:flex;align-items:center;gap:12px}
+  .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#f3d9a3,#cda15d);display:flex;align-items:center;justify-content:center;font-weight:800;font-family:"Playfair Display";color:#2b2b2b;font-size:20px;box-shadow:0 6px 18px var(--shadow);border:2px solid #e6c98a}
+  .brand h1{margin:0;font-family:"Playfair Display";font-size:20px;color:#2b2b2b}
+  nav{display:flex;gap:10px}
+  nav button{background:transparent;border:1.5px solid #e6e1d3;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:700;color:#3b2f2b;transition:all .18s cubic-bezier(.2,.9,.2,1)}
+  nav button:hover{background:linear-gradient(90deg,#cda15d,#edd3a0);border-color:#cda15d;color:#1f1a12;box-shadow:0 4px 12px var(--shadow);transform:translateY(-2px)}
+  .cta{background:#2b2b2b;color:white;padding:8px 12px;border-radius:12px;border:0;cursor:pointer;font-weight:700}
+
+  /* Mover perfil y carrito (carrito a la izquierda del perfil) */
+  .profile-icon{
+    position:fixed !important; right:26px; top:18px; z-index:500;
+    background:rgba(255,255,255,0.98); border-radius:10px; padding:6px 8px;
+    box-shadow:0 6px 18px var(--shadow); display:flex; align-items:center; gap:6px;
+    cursor:pointer; border:1px solid #f1e9db;
+  }
+  /* Mostrar solo el rol en el botón de perfil */
+  .profile-icon .avatarImg, .profile-icon #profileLabel{ display:none !important; }
+  .profile-icon .roleBadge{ font-size:12px; padding:2px 8px; }
+  .cart-icon{
+    position:fixed;
+    right:110px; /* ahora a la izquierda del perfil */
+    top:18px;
+    z-index:120;
+    background:rgba(255,255,255,0.98);
+    border-radius:12px;
+    padding:10px;
+    box-shadow:0 6px 18px var(--shadow);
+    display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid #f1e9db
+  }
+
+  .cart-total-bubble{
+    background:#2b2b2b;color:#fff;padding:4px 8px;border-radius:999px;
+    font-weight:700;font-size:12px;box-shadow:0 4px 12px var(--shadow);
+    display:none;
+  }
+
+  /* Purchase popups (left toasts) */
+  #purchasePopups{
+    position:fixed; left:16px; bottom:24px; z-index:900;
+    display:flex; flex-direction:column; gap:8px; pointer-events:none;
+  }
+  .purchasePopup{
+    width:280px; background:#fff; border:1px solid #f1e9db; border-left:4px solid var(--accent);
+    border-radius:10px; box-shadow:0 10px 30px var(--shadow);
+    opacity:0; transform:translateX(-20px);
+    transition: transform .28s cubic-bezier(.2,.9,.2,1), opacity .28s ease, margin-top .25s ease;
+  }
+  .purchasePopup.enter{ opacity:1; transform:translateX(0); }
+  .purchasePopup.exit{ opacity:0; transform:translateX(-60px); }
+  .purchasePopup .ppInner{ display:flex; gap:10px; align-items:center; padding:10px 12px; }
+  .purchasePopup img{ width:36px; height:36px; border-radius:8px; object-fit:cover; border:1px solid #eee; }
+  .purchasePopup .ppText{ line-height:1.25; color:#333; }
+  .purchasePopup .ppText .ppLine{ font-weight:700; font-size:12px; }
+  .purchasePopup .ppText .ppSub{ font-size:11px; color:var(--muted); margin-top:2px; }
+  .purchasePopup.shiftDown{ margin-top:6px; }
+  .purchasePopup .ppList{ margin:6px 0 0 0; padding-left:16px; }
+  .purchasePopup .ppList li{ font-size:11px; color:#2b2b2b; }
+  /* Emerald appointment popups */
+  .appointmentPopup{
+    width:280px; background:#fff; border:2px solid #10b981; border-left:6px solid; border-image:linear-gradient(180deg,#10b981,#34d399) 1;
+    border-radius:10px; box-shadow:0 10px 30px var(--shadow);
+    opacity:0; transform:translateX(-20px);
+    transition: transform .28s cubic-bezier(.2,.9,.2,1), opacity .28s ease, margin-top .25s ease;
+    margin-bottom:0;
+  }
+  .appointmentPopup.enter{ opacity:1; transform:translateX(0); }
+  .appointmentPopup.exit{ opacity:0; transform:translateX(-60px); }
+  .appointmentPopup .apInner{ display:flex; gap:10px; align-items:center; padding:10px 12px; }
+  .appointmentPopup img{ width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid #10b981; background:#e6fff4; }
+  .appointmentPopup .apText{ line-height:1.25; color:#1b3b2b; flex:1; }
+  .appointmentPopup .apText .apLine{ font-weight:700; font-size:13px; }
+  .appointmentPopup .apText .apSub{ font-size:11px; color:#10b981; margin-top:2px; }
+  .appointmentPopup.shiftDown{ margin-top:6px; }
+  /* Gold style for large orders (≥3 items) with shimmer */
+  .purchasePopup.gold{
+    background:linear-gradient(135deg,#f3d9a3,#cda15d,#f3d9a3);
+    background-size:200% 200%;
+    border:2px solid #e6c98a; border-left:4px solid #e6c98a;
+    animation: goldShimmer 4s ease-in-out infinite, goldGlow 3.5s ease-in-out infinite;
+  }
+  .purchasePopup.gold .ppText .ppSub{ color:#1f1a12; }
+
+  @keyframes goldShimmer{
+    0%{ background-position:0% 50% }
+    50%{ background-position:100% 50% }
+    100%{ background-position:0% 50% }
+  }
+  @keyframes goldGlow{
+    0%{ box-shadow:0 10px 30px var(--shadow), 0 0 4px rgba(205,161,93,.20) }
+    50%{ box-shadow:0 10px 30px var(--shadow), 0 0 14px rgba(205,161,93,.45) }
+    100%{ box-shadow:0 10px 30px var(--shadow), 0 0 4px rgba(205,161,93,.20) }
+  }
+
+
+  
+  main{max-width:1200px;margin:28px auto;padding:0 18px}
+  .hero{display:grid;grid-template-columns:1fr 420px;gap:22px;align-items:center;position:relative}
+  /* Ruleta de imágenes */
+  .imageRouletteFrame{
+    position:relative;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    height:240px;
+    margin-top:-60px;
+    margin-bottom:12px;
+    margin-left:40px;
+  }
+  .imageRoulette{
+    display:flex;align-items:center;justify-content:center;gap:0;width:360px;height:320px;position:relative;
+  }
+  .rouletteImg{
+    width:220px;height:280px;object-fit:cover;border-radius:18px;box-shadow:0 6px 24px var(--shadow);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(1);opacity:1;z-index:2;
+    transition:all 2.2s cubic-bezier(.65,0,.35,1);
+  }
+  .rouletteImg.left{
+    left:10%;top:50%;transform:translate(-50%,-50%) scale(0.82);opacity:0.6;z-index:1;filter:blur(1px) grayscale(0.2);
+  }
+  .rouletteImg.right{
+    left:90%;top:50%;transform:translate(-50%,-50%) scale(0.82);opacity:0.6;z-index:1;filter:blur(1px) grayscale(0.2);
+  }
+  .rouletteImg.center{
+    left:50%;top:50%;transform:translate(-50%,-50%) scale(1.08);opacity:1;z-index:3;box-shadow:0 10px 40px #e6c98a99,0 6px 24px var(--shadow);
+  }
+  .rouletteImg.hidden{opacity:0;pointer-events:none;}
+  .rouletteNav{position:absolute;top:50%;left:0;right:0;display:flex;justify-content:space-between;pointer-events:none;z-index:10;}
+  .rouletteNavBtn{background:rgba(255,255,255,0.7);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px var(--shadow);cursor:pointer;pointer-events:auto;transition:background .2s;}
+  .rouletteNavBtn:hover{background:#f3d9a3;}
+  .heroCard{background:linear-gradient(180deg,#fff,#fff);border-radius:18px;padding:28px;box-shadow:0 10px 30px var(--shadow)}
+  .heroCard h2{font-family:"Playfair Display";font-size:34px;margin:0 0 8px;color:#2b2b2b}
+  .heroCard p{color:var(--muted);margin:0 0 14px}
+  .heroImg{border-radius:18px;overflow:hidden;box-shadow:0 10px 30px var(--shadow);position:relative}
+  .heroImg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity 1.2s ease;}
+  .heroImg img.hidden{opacity:0}
+  .heroImg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(255,255,255,0.05), rgba(0,0,0,0.15));pointer-events:none}
+  @keyframes overlayPulse{0%{opacity:0}20%{opacity:.25}100%{opacity:0}}
+  .heroImg.swap::after{animation:overlayPulse 1.2s ease}
+
+  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+  .gallery img{width:100%;height:120px;object-fit:cover;border-radius:12px;display:block}
+
+  section{margin-bottom:18px}
+  .card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 18px var(--shadow)}
+  h3{font-family:"Playfair Display";margin:0 0 8px}
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+  .feature{padding:14px;border-radius:12px;background:linear-gradient(180deg,#fff,#fff);border:1px solid #f3efe7;text-align:center;color:#333}
+
+  /* Appointments form */
+  .formRow{display:flex;gap:10px}
+  .formCol{flex:1}
+  label{display:block;font-size:13px;color:var(--muted);margin-top:8px;font-weight:600}
+  input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #eee;margin-top:6px;font-size:14px}
+  .small{font-size:13px;color:var(--muted)}
+
+  .appointmentsList{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+  .appCard{display:flex;gap:12px;align-items:center;border-radius:12px;padding:10px;border:1px solid #f1e6d8}
+  .appCard img{width:72px;height:72px;border-radius:10px;object-fit:cover}
+
+  /* Shop layout */
+  .shopWrap{display:grid;grid-template-columns:1fr 340px;gap:18px;margin-top:12px}
+  @media(max-width:980px){.hero{grid-template-columns:1fr}.shopWrap{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(2,1fr)}}
+  .productsGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  .productCard{background:#fff;border-radius:6px;padding:14px;text-align:left;border:1px solid #f3efe7;display:flex;flex-direction:column;gap:8px;align-items:stretch;position:relative}
+  .productCard.popular{ border:2px solid #cda15d }
+  .productImg{width:100%;height:140px;object-fit:cover;border-radius:6px}
+  .productTitle{font-size:14px;margin:4px 0 2px;height:32px;overflow:hidden}
+  .productDesc{font-size:12px;color:#6b6b6b;line-height:1.4;margin:0 0 6px}
+  .productPrice{font-weight:700;color:#2b2b2b;margin-bottom:6px}
+  .productActions{display:flex;gap:8px;align-items:center;margin-top:6px}
+  .qtyInput{width:60px;padding:8px;border:1px solid #e6e1d3;border-radius:6px;text-align:center;font-weight:700;font-size:14px}
+  /* Botón animado dentro de cada producto */
+  .addBtn{
+    flex:1;
+    background:linear-gradient(90deg,#cda15d 0%, #edd3a0 50%, #cda15d 100%);
+    background-size:200% 100%;
+    border:1.5px solid #cda15d;
+    color:#1f1a12;
+    padding:10px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:800;
+    transition:transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s, filter .18s, background-position .6s ease;
+  }
+  .addBtn:hover{ background-position:100% 0; box-shadow:0 4px 12px var(--shadow); filter:brightness(0.98) }
+  .addBtn:active{ transform:scale(0.98) }
+  .addBtn.added{ opacity:0.98; box-shadow:0 0 0 6px rgba(205,161,93,0.08) inset }
+
+  /* Precio y descuento mejorados */
+  .priceWrap{ display:flex; align-items:flex-start; gap:10px; margin-bottom:6px }
+  .discountTag{ background:linear-gradient(90deg,#10b981,#34d399); color:#0f1a12; font-weight:800; padding:2px 8px; border-radius:6px; font-size:12px; border:1px solid #10b981 }
+  .oldPrice{ text-decoration:line-through; color:#9b9b9b; font-size:12px }
+  .finalPrice{ color:#1b1b1b; font-weight:900; font-size:16px }
+  .priceStack{ display:flex; flex-direction:column; line-height:1.1 }
+
+  /* cart panel */
+  .cartPanel{position:sticky;top:90px;border-radius:12px;padding:8px;background:linear-gradient(180deg,#ffffff,#fffdf8);border:1px solid #efe7d8;box-shadow:0 10px 30px var(--shadow);max-height:80vh;overflow:auto;scrollbar-width:none}
+  .cartPanel::-webkit-scrollbar{ display:none }
+  .cartPanel h3{ margin:0 0 6px; font-size:16px }
+  .cartPanel h4{ margin:4px 0 6px; font-size:14px }
+  .checkoutStep{margin-bottom:6px}
+  .checkoutStep > div{ margin-top:6px }
+  .cartList{min-height:40px}
+  .cartItem{display:flex;align-items:center;justify-content:space-between;padding:8px;border-bottom:1px dashed #efe7d8;border-radius:6px}
+  .cartItem:hover{background:#fffaf0}
+  .cartItem.hidden{display:none}
+  .trashBtn{background:transparent;border:0;font-size:16px;cursor:pointer;color:#999;transition:color .12s ease;font-weight:700}
+  .trashBtn:hover{color:#e74c3c}
+  .cartToggleBtn{width:100%;padding:8px;margin-top:8px;background:#f9f6f1;border:1px solid #e6e1d3;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;color:#3b2b2b;transition:background .12s}
+  .cartToggleBtn:hover{background:#f3efe7}
+  .checkoutStep{display:none}
+  .checkoutStep.active{display:block}
+  .stepNav{display:flex;gap:8px;margin-top:12px}
+  .stepNavBtn{flex:1;padding:10px;border-radius:6px;border:1.5px solid #e6e1d3;background:#fff;cursor:pointer;font-weight:700;font-size:13px;transition:all .18s}
+  .stepNavBtn:hover{background:#f9f6f1}
+  .stepNavBtn.primary{background:linear-gradient(90deg,#cda15d,#edd3a0);border-color:#cda15d;color:#1f1a12}
+  .stepNavBtn.primary:hover{filter:brightness(0.97)}
+
+  .checkoutBtn{width:100%;padding:12px;border-radius:8px;background:linear-gradient(90deg,#cda15d,#edd3a0);color:#1f1a12;border:1.5px solid #cda15d;margin-top:12px;font-weight:800;box-shadow:0 4px 12px var(--shadow);transition:filter .18s}
+  .checkoutBtn:hover{filter:brightness(0.97)}
+
+  .paymentMethods{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .pmOption{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid #eee;cursor:pointer}
+  .pmOption input{display:none}
+  .pmOption.active{border-color:var(--accent);background:linear-gradient(90deg,#fff,#fff)}
+
+  .logosvg{width:48px;height:28px;display:block}
+
+  .payForm{margin-top:12px}
+  .payRow{display:flex;gap:8px}
+  .payRow .formCol{flex:1}
+
+  .floatAdd{position:fixed;right:26px;top:26px;padding:6px 9px;background:var(--accent);color:#fff;border-radius:999px;transform:translateY(-20px);opacity:0;pointer-events:none;transition:all .6s cubic-bezier(.2,.9,.2,1);display:none}
+  .floatAdd.show{transform:translateY(0);opacity:1}
+
+  footer{padding:30px;text-align:center;color:var(--muted);margin-top:40px}
+
+  /* Estilo para botón activo del nav (dorado) */
+  nav button.active{ background:linear-gradient(90deg,#cda15d,#edd3a0); border:1.5px solid #cda15d; color:#1f1a12 }
+
+  /* Mapa embebido responsive simple */
+  .mapFrame{ width:100%; height:260px; border:0; border-radius:12px }
+  @media(max-width:980px){ .mapFrame{ height:220px } }
+
+  /* Modal añadir producto (visibilidad y contraste) */
+  .adminModal{
+    background:#ffffff;
+    border:1px solid #efe7d8;
+    border-radius:12px;
+    padding:16px;
+    width:520px; max-width:calc(100% - 36px);
+    box-shadow:0 18px 40px rgba(0,0,0,0.12);
+    animation:modalDrop .18s ease;
+  }
+  .adminModalBack{ backdrop-filter: blur(2px) }
+  @keyframes modalDrop{ from{ transform:translateY(-6px); opacity:0 } to{ transform:translateY(0); opacity:1 } }
+
+  /* Badge dorado sobre productos */
+  .shopBadge{
+    margin-bottom:10px;
+    padding:10px 12px;
+    border:2px solid #cda15d;
+    background:linear-gradient(90deg,#fffdf6,#ffffff);
+    border-radius:6px;
+    font-weight:800;
+    color:#1b1b1b;
+    box-shadow:0 4px 12px var(--shadow);
+    font-family:'Playfair Display',serif;
+    letter-spacing:.3px;
+  }
+  .popularBadge{
+    position:absolute; top:8px; left:8px;
+    padding:4px 8px;
+    border:2px solid #cda15d;
+    background:linear-gradient(90deg,#fff8e9,#ffffff);
+    border-radius:6px;
+    font-weight:800;
+    color:#1b1b1b;
+    box-shadow:0 2px 8px var(--shadow);
+    font-size:12px;
+    line-height:1;
+    display:flex; align-items:center; gap:6px;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .popularBadge img.popularIcon{ width:14px; height:14px; object-fit:contain; display:block }
+  .popularBadge img.popularWarn{ width:12px; height:12px; object-fit:contain; display:block; filter:drop-shadow(0 0 2px rgba(0,0,0,0.15)) }
+  .popularBadge .popularSparkles{ position:absolute; inset:0; pointer-events:none }
+  .popularBadge .popularSparkles .sparkle{
+    position:absolute; top:50%; left:-15%; width:4px; height:4px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,230,170,0.9) 50%, rgba(205,161,93,0.0) 75%);
+    filter:drop-shadow(0 0 4px rgba(205,161,93,0.6));
+    transform:translate(-15%, -50%);
+    animation:moveSparkleSmall 5s linear infinite;
+  }
+  .popularBadge .popularSparkles .sparkle:nth-child(2){ top:35%; animation-duration:6.5s }
+  .popularBadge .popularSparkles .sparkle:nth-child(3){ top:65%; animation-duration:7.5s }
+  @keyframes moveSparkleSmall{
+    0%{ transform:translate(-15%, -50%) scale(0.9) }
+    100%{ transform:translate(120%, -50%) scale(1) }
+  }
+
+  /* Barra superior con degradado dorado y brillos animados */
+  header{ position:sticky; top:0 }
+  .headerGradient{
+    position:relative;
+    width:100%;
+    height:10px;
+    border-radius:8px;
+    background:linear-gradient(90deg,#cda15d 0%, #edd3a0 50%, #cda15d 100%);
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .headerSparkles{ position:absolute; inset:0; pointer-events:none }
+  .headerSparkles .sparkle{
+    position:absolute; top:50%; left:-10%;
+    width:8px; height:8px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,230,170,0.9) 40%, rgba(205,161,93,0.6) 60%, rgba(205,161,93,0.0) 75%);
+    filter:blur(0.3px) drop-shadow(0 0 6px rgba(205,161,93,0.7));
+    transform:translateY(-50%);
+    animation:moveSparkle 6s linear infinite;
+  }
+  @keyframes moveSparkle{
+    0%{ transform:translate(-10%, -50%) scale(0.8) }
+    50%{ transform:translate(50vw, -50%) scale(1) }
+    100%{ transform:translate(110vw, -50%) scale(0.8) }
+  }
+  .headerSparkles .sparkle:nth-child(2){ top:35%; animation-duration:7.5s; animation-delay:1s; width:6px; height:6px; }
+  .headerSparkles .sparkle:nth-child(3){ top:65%; animation-duration:8.5s; animation-delay:2.2s; width:5px; height:5px; }
+  .headerSparkles .sparkle:nth-child(4){ top:25%; animation-duration:10s; animation-delay:3.1s; width:7px; height:7px; }
+  .headerSparkles .sparkle:nth-child(5){ top:75%; animation-duration:9s; animation-delay:4.2s; width:6px; height:6px; }
+  .headerSparkles .sparkle:nth-child(6){ top:50%; animation-duration:11s; animation-delay:5s; width:9px; height:9px; }
+
+  /* Fondo de video permanente */
+  .videoBackground{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .videoBackground video{
+    position:absolute;
+    top:50%;left:50%;
+    min-width:100%;min-height:100%;
+    width:auto;height:auto;
+    transform:translate(-50%,-50%);
+    object-fit:cover;
+    filter:blur(6px) brightness(0.7);
+  }
+  header,main,footer{position:relative;z-index:1}
+
+  .chatBox{
+  border:1px solid #f3efe7;
+  border-radius:12px;
+  padding:12px;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  max-width:100%;
+}
+.chatMessages{
+  max-height:260px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding-right:4px;
+}
+.chatMsg{
+  padding:8px 10px;
+  border-radius:10px;
+  font-size:13px;
+  line-height:1.35;
+  max-width:75%;
+  word-wrap:break-word;
+  box-shadow:0 2px 6px var(--shadow);
+}
+.chatMsg.user{ background:#2b2b2b; color:#fff; align-self:flex-end }
+.chatMsg.bot{ background:#faf7f1; color:#222; border:1px solid #eee }
+.chatInputRow{ display:flex; gap:8px }
+.chatInputRow input{ flex:1; padding:10px; border-radius:10px; border:1px solid #e6e1d3; font-size:14px }
+.chatSendBtn{ background:#2fb36b; color:#fff; border:0; padding:10px 16px; border-radius:10px; cursor:pointer; font-weight:600 }
+.chatSendBtn:hover{ filter:brightness(.95) }
+
+  .avatarImg{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  object-fit:cover;
+  display:block;
+  border:2px solid #ffffff;
+  box-shadow:0 2px 6px var(--shadow);
+  background:#2b2b2b;
+}
+
+/* Drop caps - primera letra grande */
+.drop-cap::first-letter{
+  float:left;
+  font-family:'Playfair Display',serif;
+  font-size:56px;
+  line-height:48px;
+  padding:8px 8px 0 0;
+  color:var(--accent);
+  font-weight:700;
+}
+
+/* Iconos decorativos */
+.icon-text{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+.icon-text::before{
+  content:'';
+  display:none;
+}
+/* Desactivar iconos decorativos previos */
+.icon-services::before,
+.icon-why::before,
+.icon-team::before,
+.icon-facilities::before,
+.icon-mission::before,
+.icon-vision::before,
+.icon-values::before,
+.icon-history::before,
+.icon-awards::before,
+.icon-philosophy::before,
+.icon-excellence::before{ content:''; display:none; }
+
+/* Mejorar textos formales */
+.formal-text{
+  font-family:'Playfair Display',serif;
+  font-size:15px;
+  line-height:1.8;
+  color:#3b2f2b;
+  text-align:justify;
+  letter-spacing:0.3px;
+}
+
+.elegant-heading{
+  font-family:'Playfair Display',serif;
+  letter-spacing:1px;
+  border-bottom:2px solid var(--accent);
+  padding-bottom:8px;
+  display:inline-block;
+  background:linear-gradient(90deg,#cda15d,#edd3a0);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  font-weight:800;
+}
+/* Banners anchos y bajos */
+.wideBanner{
+  width:100%;
+  height:160px;
+  object-fit:cover;
+  display:block;
+  border-radius:8px;
+  box-shadow:0 6px 18px var(--shadow);
+}
+@media(max-width:768px){ .wideBanner{ height:120px } }
+/* Ajustes de estilo solicitados */
+/* Oscurecer texto de párrafos */
+p, .small, .formal-text{ color:#1b1b1b !important; }
+
+/* Titulares y subtítulos en negrita */
+h1, h2, h3, h4{ font-weight:800 !important; }
+.elegant-heading, .icon-text strong{ font-weight:800 !important; }
+
+/* Reducir redondeado general */
+.card, .heroCard, .heroImg, .gallery img, .feature,
+.productCard, .productImg, .cartPanel, .pmOption,
+.checkoutBtn, .addBtn, .loginBtn, .logoutBtn, .mapFrame,
+.chatMsg, .adminModal, .profile-icon, .cart-icon, .logo,
+.avatarImg, .floatAdd, input, select, textarea, .appCard{
+  border-radius:6px !important;
+}
+</style>
+</head>
+<body>
+<div class="videoBackground" id="videoBackground">
+  <video autoplay muted loop playsinline preload="auto" id="bgVideo">
+    <source src="Videos/bg.mp4" type="video/mp4">
+    
+  </video>
+</div>
+
+<header>
+  <div style="display:flex;align-items:center">
+    <div class="logo">M&P</div>
+    <div style="margin-left:12px">
+      <div class="brand"><h1>Maison Paws</h1></div>
+      <div style="font-size:12px;color:var(--muted)">Grooming • Spa • Boutique</div>
+    </div>
+    <nav style="margin-left:22px">
+      <button onclick="showSection('home')" id="nav-home">Inicio</button>
+      <button onclick="showSection('appointments')" id="nav-appt">Agendar cita</button>
+      <button onclick="showSection('shop')" id="nav-shop">Tienda</button>
+      <button onclick="showSection('about')" id="nav-about">Nosotros</button>
+    </nav>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px">
+    
+    <div class="profile-icon" id="profileToggle" title="Perfil">
+      <img id="profileAvatarImg" class="avatarImg" src="https://es.dreamstime.com/vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-image183042379" alt="Perfil">
+      <div style="font-size:13px;color:#000" id="profileLabel">Invitado</div>
+      <span class="roleBadge" id="roleBadge" style="display:none">cliente</span>
+    </div>
+  </div>
+</header>
+
+<!-- Barra dorada con brillos animados -->
+<div class="headerGradient" aria-hidden="true">
+  <div class="headerSparkles">
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+  </div>
+  
+</div>
+
+
+<div class="profilePanel" id="profilePanel"></div>
+
+
+<button class="adminFab" id="adminFab" title="Añadir producto" onclick="openAddProduct()">+</button>
+
+<div class="adminModalBack" id="adminModalBack">
+  <div class="adminModal">
+    <h3 style="margin:0 0 10px">Añadir producto</h3>
+    <div class="adminGrid">
+      <div>
+        <label>ID (solo números)</label>
+        <input id="ap_id" placeholder="Ej: 25" type="number" min="1">
+      </div>
+      <div>
+        <label>Categoría</label>
+        <select id="ap_cat">
+          <option value="">Seleccionar...</option>
+          <option>Alimentos</option>
+          <option>Accesorios</option>
+          <option>Juguetes</option>
+          <option>Higiene</option>
+          <option>Ropa</option>
+          <option>Salud</option>
+        </select>
+      </div>
+      <div class="full">
+        <label>Nombre</label>
+        <input id="ap_name" placeholder="Nombre del producto">
+      </div>
+      <div class="full">
+        <label>Descripción (opcional)</label>
+        <textarea id="ap_desc" rows="2" placeholder="Breve descripción del producto"></textarea>
+      </div>
+      <div>
+        <label>Precio (COP)</label>
+        <input id="ap_price" type="number" min="1" placeholder="Ej: 45000">
+      </div>
+      <div>
+        <label>Descuento (%)</label>
+        <input id="ap_discount" type="number" min="0" max="90" placeholder="Ej: 10">
+      </div>
+      <div class="full">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="ap_popular" style="cursor:pointer;width:18px;height:18px">
+          <span style="font-weight:700">Producto Popular</span>
+        </label>
+      </div>
+      <div class="full">
+        <label>Imagen (URL)</label>
+        <input id="ap_img" placeholder="URL de la imagen" value="https://via.placeholder.com/300x200.png?text=Producto">
+      </div>
+    </div>
+    <div class="adminActions">
+      <button class="logoutBtn" onclick="closeAddProduct()">Cancelar</button>
+      <button class="loginBtn saveProductBtn" onclick="saveNewProduct()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- HOME -->
+  <section id="home" class="active">
+    <div class="hero">
+      <div class="heroCard">
+        <h2 class="elegant-heading">Cuidado Boutique para su Mascota</h2>
+        <p class="formal-text drop-cap" style="margin-top:14px">Maison Paws ofrece tratamientos premium, productos seleccionados y un servicio pensado para reducir el estrés de su animal de compañía. Reserve, adquiera y consienta con la más alta calidad disponible en el sector.</p>
+        <img class="wideBanner" src="https://static.wixstatic.com/media/11062b_0cee0e2f2b434966a50dc8447c6d601d~mv2.jpg/v1/fill/w_640,h_296,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/11062b_0cee0e2f2b434966a50dc8447c6d601d~mv2.jpg" alt="Mascota disfrutando en boutique" style="margin-top:12px">
+        
+        <p class="formal-text" style="margin-top:12px;line-height:1.8">
+          Desde el año 2020, nos especializamos en brindar experiencias personalizadas que priorizan el bienestar físico y emocional de cada mascota. Nuestro distinguido equipo cuenta con certificaciones internacionales en grooming profesional, comportamiento animal y primeros auxilios veterinarios.
+        </p>
+
+        <p class="formal-text drop-cap" style="margin-top:12px;line-height:1.8">
+          En nuestra tienda encontrará categorías como alimentos, higiene, accesorios, juguetes, salud y ropa, con filtros por categoría y descuentos dinámicos. Seleccionamos productos que complementan cada servicio para que el cuidado continúe en casa con la misma calidad.
+        </p>
+
+        <div style="margin-top:18px">
+          <div class="icon-text icon-services">
+            <strong style="font-family:'Playfair Display';font-size:17px;color:#2b2b2b">Nuestros Servicios Especializados</strong>
+          </div>
+          <ul style="margin:8px 0 0 18px;color:var(--muted);line-height:1.9;font-size:14px">
+            <li>Baño & secado con productos hipoalergénicos importados de primera calidad</li>
+            <li>Corte y estilizado profesional según estándares de raza y preferencias personales</li>
+            <li>Spa relajante con aromaterapia y musicoterapia especializada</li>
+            <li>Tratamientos dermatológicos con productos veterinarios certificados</li>
+            <li>Limpieza dental profesional y cuidado especializado de orejas</li>
+            <li>Tintes y diseños creativos con colorantes pet-safe certificados</li>
+          </ul>
+        </div>
+        <img class="wideBanner" src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1200&q=80&auto=format&fit=crop" alt="Sesión de grooming profesional" style="margin-top:14px">
+        
+        <div style="margin-top:16px;padding:16px;background:linear-gradient(135deg,#fdfbf7 0%,#f9f6f1 100%);border-radius:12px;border-left:4px solid var(--accent);box-shadow:0 4px 12px rgba(0,0,0,0.05)">
+          <div class="icon-text icon-why">
+            <strong style="font-family:'Playfair Display';font-size:17px;color:#2b2b2b">¿Por Qué Elegir Maison Paws?</strong>
+          </div>
+          <p class="formal-text drop-cap" style="margin:8px 0 0;line-height:1.8;font-size:14px">
+            Utilizamos técnicas de manejo con enfoque en reducción de estrés, instalaciones con climatización óptima, música relajante científicamente seleccionada y protocolos de seguridad rigurosamente supervisados. Cada mascota recibe atención individualizada en un ambiente sereno diseñado específicamente para maximizar su comodidad y bienestar.
+          </p>
+        </div>
+
+        
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div class="heroImg">
+          <img src="https://images.unsplash.com/photo-1560807707-8cc77767d783?w=1000&q=80&auto=format&fit=crop" alt="Maison Paws hero">
+        </div>
+        <div class="imageRouletteFrame">
+          <div class="imageRoulette" id="imageRoulette"></div>
+        </div>
+        
+        <div style="background:linear-gradient(135deg,#fdfbf7,#f9f6f1);border-radius:14px;padding:18px;box-shadow:0 6px 18px var(--shadow);border:1px solid #f3efe7;margin-top:80px">
+          <h3 style="font-family:'Playfair Display';font-size:18px;margin:0 0 10px;color:#2b2b2b"> Experiencia Premium</h3>
+          <p style="font-size:13px;line-height:1.7;color:#3b2b2b;margin:0">
+            Descubre el grooming de lujo con productos naturales importados, técnicas de manejo con bajo estrés y un equipo certificado internacionalmente.
+          </p>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f1e9db">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <span style="font-size:20px"></span>
+              <span style="font-size:12px;color:#555">Certificación Internacional</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <span style="font-size:20px"></span>
+              <span style="font-size:12px;color:#555">Productos 100% Naturales</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:20px"></span>
+              <span style="font-size:12px;color:#555">Atención Personalizada</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,#e6fff4,#f0fdf8);border-radius:14px;padding:16px;box-shadow:0 4px 12px rgba(16,185,129,0.15);border:2px solid #10b981;margin-top:18px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="font-size:24px">📅</span>
+            <strong style="font-family:'Playfair Display';font-size:16px;color:#1b3b2b">Agenda tu Cita</strong>
+          </div>
+          <p style="font-size:12px;line-height:1.6;color:#0f5132;margin:0 0 10px">
+            Horarios flexibles de lunes a sábado. Reserva con anticipación para garantizar tu espacio.
+          </p>
+          <button class="cta" onclick="showSection('appointments')" style="width:100%;background:linear-gradient(90deg,#10b981,#34d399);border:none;font-size:13px">
+            Reservar Ahora
+          </button>
+        </div>
+
+        <div style="background:linear-gradient(135deg,#fff7e6,#fef9f0);border-radius:14px;padding:16px;box-shadow:0 4px 12px rgba(205,161,93,0.15);border:2px solid #cda15d;margin-top:12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="font-size:24px">🛍️</span>
+            <strong style="font-family:'Playfair Display';font-size:16px;color:#2b2b2b">Nuestra Tienda</strong>
+          </div>
+          <p style="font-size:12px;line-height:1.6;color:#5a4a2a;margin:0 0 10px">
+            Explora productos premium seleccionados para el bienestar de tu mascota. Descuentos especiales disponibles.
+          </p>
+          <button class="cta" onclick="goToShop()" style="width:100%;background:linear-gradient(90deg,#cda15d,#edd3a0);border:none;font-size:13px;color:#1f1a12">
+            Ir a la Tienda
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <section style="margin-top:18px">
+      <div class="card">
+        <div class="icon-text icon-philosophy">
+          <h3 class="elegant-heading" style="margin:0">Nuestra Filosofía de Cuidado Integral</h3>
+        </div>
+        <p class="formal-text drop-cap" style="margin-top:14px;line-height:1.8">
+          Cada mascota merece una experiencia serena, segura y placentera. Nuestro distinguido equipo está capacitado para manejar animales de todas las edades y tamaños, con especial atención a casos de ansiedad, sensibilidad o necesidades especiales. Trabajamos con paciencia y respeto, comprendiendo que cada animal posee su propio ritmo y personalidad únicos.
+        </p>
+        
+        <div style="margin-top:14px;padding:12px;background:#fdfbf7;border-radius:10px;border-left:3px solid var(--accent)">
+          <div class="icon-text icon-excellence">
+            <strong style="font-family:'Playfair Display';font-size:16px;color:#2b2b2b">Compromiso con la Excelencia</strong>
+          </div>
+          <p class="formal-text" style="margin:6px 0 0;line-height:1.8;font-size:14px">
+            Actualizamos constantemente nuestras técnicas mediante formación continua, participación en conferencias internacionales y colaboración con veterinarios especializados. Nuestras instalaciones cumplen rigurosamente con todos los estándares de bioseguridad y confort animal establecidos por las autoridades competentes.
+          </p>
+        </div>
+
+        <div class="features" style="margin-top:12px">
+          <div class="feature"><strong>Atención personalizada</strong><p class="small">Protocolos adaptados según temperamento, raza y condición física</p></div>
+          <div class="feature"><strong>Productos premium</strong><p class="small">Insumos naturales, veganos y dermatológicamente probados</p></div>
+          <div class="feature"><strong>Ambiente calmado</strong><p class="small">Iluminación suave, música especializada y zonas de relajación</p></div>
+        </div>
+        
+        <div class="features" style="margin-top:12px">
+          <div class="feature"><strong>Equipamiento moderno</strong><p class="small">Tecnología de última generación para máximo confort</p></div>
+          <div class="feature"><strong>Higiene rigurosa</strong><p class="small">Desinfección entre servicios y equipos esterilizados</p></div>
+          <div class="feature"><strong>Seguimiento post-servicio</strong><p class="small">Recomendaciones personalizadas para el cuidado en casa</p></div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- APPOINTMENTS -->
+  <section id="appointments" style="display:none">
+    <div class="card">
+      <h3>Agendar cita</h3>
+      <form id="appointmentForm" style="margin-top:10px">
+        <div class="formRow">
+          <div class="formCol">
+            <label>Nombre del propietario</label>
+            <input id="ownerName" placeholder="Ej: Mariana Pérez" required>
+          </div>
+          <div class="formCol">
+            <label>Nombre de la mascota</label>
+            <input id="petName" placeholder="Ej: Coco" required>
+          </div>
+        </div>
+
+        <div class="formRow" style="margin-top:6px">
+          <div class="formCol">
+            <label>Tipo de mascota</label>
+            <select id="petType">
+              <option>Perro</option><option>Gato</option><option>Conejo</option><option>Ave</option><option>Pez</option>
+              Otros</option>
+            </select>
+          </div>
+          <div class="formCol">
+            <label>Servicio</label>
+            <select id="serviceType">
+              <option value="Baño Básico">Baño Básico</option>
+              <option value="Corte y Estilizado">Corte y Estilizado</option>
+              <option value="Spa Completo">Spa Completo</option>
+              <option value="Vacunación">Vacunación</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="formRow">
+          <div class="formCol">
+            <label>Fecha</label><input type="date" id="apptDate" required>
+          </div>
+          <div class="formCol">
+            <label>Hora</label><input type="time" id="apptTime" required>
+          </div>
+        </div>
+
+        <label>Notas (alergias, comportamiento, preferencias)</label>
+        <textarea id="notes" rows="2" placeholder="Ej: No usar perfumes fuertes"></textarea>
+
+        <div style="margin-top:12px;display:flex;gap:10px">
+
+        <div style="margin-top:12px;display:flex;gap:10px">
+          <button class="cta" type="submit">Guardar cita</button>
+          <button type="button" class="addBtn" onclick="document.getElementById('appointmentForm').reset()">Limpiar</button>
+        </div>
+
+        <div class="small" style="margin-top:8px">Las citas se guardan localmente. En producción conectar a servidor para confirmaciones.</div>
+      </form>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <h3>Citas guardadas</h3>
+      <div class="appointmentsList" id="appointmentsList"></div>
+    </div>
+  </section>
+
+  <section id="about" style="display:none">
+    <div class="card">
+      <h3 class="elegant-heading">Sobre Maison Paws</h3>
+      <p class="formal-text drop-cap" style="margin-top:14px;line-height:1.8">
+        Somos un equipo apasionado por el bienestar animal, fundado en el año 2020 por profesionales con más de quince años de experiencia combinada en medicina veterinaria, grooming profesional y comportamiento animal. Cuidamos de su mascota con productos premium, protocolos rigurosamente seguros y un ambiente meticulosamente diseñado para reducir el estrés.
+      </p>
+      
+      <div style="margin-top:14px;padding:14px;background:#fdfbf7;border-radius:10px">
+        <div class="icon-text icon-team">
+          <strong style="font-family:'Playfair Display';font-size:16px;color:#2b2b2b">Nuestro Distinguido Equipo</strong>
+        </div>
+        <p class="formal-text" style="margin:6px 0 0;line-height:1.8;font-size:14px">
+          Contamos con ocho especialistas certificados, incluyendo groomers profesionales con certificación internacional, un médico veterinario consultor, y asistentes capacitados en manejo avanzado de comportamiento animal. Cada miembro del equipo participa activamente en formación continua para garantizar las mejores prácticas del sector.
+        </p>
+      </div>
+      
+      <div style="margin-top:12px;padding:14px;background:#fdfbf7;border-radius:10px">
+        <div class="icon-text icon-facilities">
+          <strong style="font-family:'Playfair Display';font-size:16px;color:#2b2b2b">Instalaciones de Primera Categoría</strong>
+        </div>
+        <p class="formal-text" style="margin:6px 0 0;line-height:1.8;font-size:14px">
+          Nuestro espacio de 200m² incluye áreas meticulosamente separadas para baño, secado, corte, spa, y una zona de espera climatizada equipada con cámaras de monitoreo que permiten a los propietarios observar el proceso en tiempo real. Utilizamos equipos de última tecnología y mantenemos estándares de limpieza de nivel hospitalario.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="features">
+        <div class="feature" style="border:2px solid #f3efe7;padding:18px;border-radius:12px">
+          <div class="icon-text icon-mission">
+            <strong style="font-family:'Playfair Display';font-size:18px">Misión</strong>
+          </div>
+          <p class="formal-text" style="line-height:1.8;margin-top:8px;font-size:13px">
+            Brindar experiencias de cuidado, estética y bienestar excepcionales para cada mascota, priorizando su seguridad, salud y confort emocional. Nos comprometemos a ser el aliado de confianza en el cuidado integral de su compañero, ofreciendo servicios que trascienden la estética para contribuir significativamente a su calidad de vida.
+          </p>
+        </div>
+        <div class="feature" style="border:2px solid #f3efe7;padding:18px;border-radius:12px">
+          <div class="icon-text icon-vision">
+            <strong style="font-family:'Playfair Display';font-size:18px">Visión</strong>
+          </div>
+          <p class="formal-text" style="line-height:1.8;margin-top:8px;font-size:13px">
+            Ser el referente local en servicios boutique para mascotas, reconocidos por nuestra excelencia, innovación y compromiso inquebrantable con el bienestar animal. Aspiramos a expandir nuestros servicios y crear una comunidad de propietarios responsables que priorizan el cuidado integral de sus distinguidos compañeros.
+          </p>
+        </div>
+        <div class="feature" style="border:2px solid #f3efe7;padding:18px;border-radius:12px">
+          <div class="icon-text icon-values">
+            <strong style="font-family:'Playfair Display';font-size:18px">Valores</strong>
+          </div>
+          <p class="formal-text" style="line-height:1.8;margin-top:8px;font-size:13px">
+            Amor incondicional por los animales, confianza fundamentada en transparencia y profesionalismo, excelencia en cada servicio prestado, responsabilidad social y ambiental, respeto profundo por cada familia que nos honra con su visita, y mejora continua en nuestras prácticas y conocimientos.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card" style="margin-top:12px">
+      <div class="icon-text icon-history">
+        <h3 class="elegant-heading" style="margin:0">Nuestra Historia</h3>
+      </div>
+      <p class="formal-text drop-cap" style="margin-top:14px;line-height:1.8">
+        Maison Paws nació del sueño de crear un espacio donde las mascotas reciban el mismo nivel de cuidado y atención que en los mejores establecimientos del mundo. Después de años trabajando en clínicas veterinarias y salones de grooming tradicionales, nuestros fundadores identificaron la necesidad imperante de un servicio que combinara profesionalismo técnico con sensibilidad emocional.
+      </p>
+      
+      <p class="formal-text" style="margin-top:12px;line-height:1.8">
+        Desde nuestros inicios, hemos atendido a más de tres mil mascotas, construyendo relaciones de confianza con familias que valoran la calidad y el trato humano. Cada éxito, cada cola moviéndose y cada mascota relajada nos motiva a seguir perfeccionando nuestros servicios.
+      </p>
+      
+      <div style="margin-top:16px;padding:16px;background:linear-gradient(135deg,#fdfbf7 0%,#f9f6f1 100%);border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05)">
+        <div class="icon-text icon-awards">
+          <strong style="font-family:'Playfair Display';font-size:17px;color:#2b2b2b">Logros Destacados</strong>
+        </div>
+        <ul style="margin:10px 0 0 18px;line-height:2;color:var(--muted);font-size:14px">
+          <li>Certificación en "Fear Free Grooming" (Grooming Libre de Miedo)</li>
+          <li>Reconocimiento local como "Mejor Servicio Boutique" 2023-2024</li>
+          <li>Alianza estratégica con fundaciones de rescate animal</li>
+          <li>95% de clientes recurrentes y recomendaciones activas</li>
+          <li>Programa de descuentos para adoptantes y mascotas rescatadas</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3>Chat-Bot Informativo:</h3>
+      <div class="small" style="margin-bottom:8px">Pregúntame sobre la misión, visión, servicios, horarios, ubicación, productos, citas o contacto.</div>
+      <div class="chatBox" id="chatBotBox">
+        <div class="chatMessages" id="chatMessages"></div>
+        <div class="chatInputRow">
+          <input id="chatInput" placeholder="Escribe tu pregunta...">
+          <button class="chatSendBtn" onclick="sendChat()">Enviar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3>Ubicación y contacto</h3>
+      <div class="formRow" style="margin-top:8px">
+        <div class="formCol">
+          <p class="small" style="margin:0 0 8px">
+            Dirección: Cra 7 # 123-45, Bogotá, Colombia<br>
+            Horario: Lun–Sáb 9:00–18:00
+          </p>
+          <p style="margin:6px 0;font-weight:600">Contáctanos</p>
+          <p class="small" style="margin:0">
+            Teléfono: <a href="tel:+573001234567">+57 300 123 4567</a><br>
+            Correo: <a href="mailto:rgarcia87@maisonpaws.co">rgarcia87@maisonpaws.co</a>
+          </p>
+        </div>
+        <div class="formCol">
+          <iframe
+            class="mapFrame"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=Cra%207%20%23123-45%20Bogot%C3%A1&output=embed">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOP -->
+  <section id="shop" style="display:none">
+    <div class="card">
+      <h3>Tienda Maison Paws</h3>
+      <div class="small" style="margin-top:6px">Selecciona una categoría para filtrar productos.</div>
+      <div class="scrollCats" id="catButtons" style="margin-top:12px"></div>
+      <div style="margin-top:10px;display:flex;justify-content:left">
+        <input id="searchInput" type="text" placeholder="Buscar producto..." style="padding:10px 14px;border-radius:10px;border:1px solid #e6e1d3;width:100%;max-width:340px;font-size:15px;box-shadow:0 2px 8px var(--shadow)">
+</div>
+    </div>
+
+    <div class="shopWrap">
+      <div class="card">
+        <div id="shopBadge" class="shopBadge" style="display:none">¡ Producto Popular</div>
+        <div class="productsGrid" id="productsGrid"></div>
+      </div>
+
+      <aside class="cartPanel card" id="cartPanel">
+        <h3>Proceso de Compra</h3>
+        
+        <!-- Step 1: Cart -->
+        <div class="checkoutStep active" id="step1">
+          <h4>Paso 1: Tu Carrito</h4>
+          <div class="small" style="margin-bottom:8px">Artículos añadidos</div>
+          <div class="cartList" id="cartList"></div>
+          <button id="cartToggleBtn" class="cartToggleBtn" style="display:none" onclick="toggleCartExpand()">Mostrar más</button>
+
+          <div style="margin-top:10px">
+            <div style="display:flex;justify-content:space-between;padding:6px 0">
+              <span>Subtotal:</span><span id="cartSubtotal">$0,00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:6px 0">
+              <span>IVA (19%):</span><span id="cartIVA">$0,00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:6px 0">
+              <span>Envío:</span><span id="cartShipping">$12.000,00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:6px 0;color:#10b981;font-size:13px">
+              <span>Ahorro total:</span><span id="cartSavings">$0,00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:2px solid #e6e1d3;margin-top:8px;font-weight:800">
+              <span>Total:</span><span id="cartTotal">$0,00</span>
+            </div>
+          </div>
+          
+          <div class="stepNav">
+            <button class="stepNavBtn primary" onclick="goToStep(2)">Continuar a Envío</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Shipping -->
+        <div class="checkoutStep" id="step2">
+          <h4>Paso 2: Datos de Envío</h4>
+          <div class="small" style="margin-bottom:8px">Ingresa tu ubicación para el envío o entrega.</div>
+
+          <div class="formRow">
+            <div class="formCol">
+              <label>Calle y número</label>
+              <input id="street" placeholder="Ej: Calle 45 #12-34" required>
+            </div>
+            <div class="formCol">
+              <label>Bloque / Apartamento</label>
+              <input id="block" placeholder="Ej: Torre B, Apto 302">
+            </div>
+          </div>
+
+          <div class="formRow">
+            <div class="formCol">
+              <label>Código postal</label>
+              <input id="postalCode" placeholder="Ej: 110111">
+            </div>
+            <div class="formCol">
+              <label>Ciudad</label>
+              <input id="city" placeholder="Ej: Bogotá">
+            </div>
+          </div>
+
+          <div style="margin-top:10px">
+            <label>Notas de entrega</label>
+            <textarea id="deliveryNotes" rows="2" placeholder="Ej: Llamar antes de llegar, dejar en portería"></textarea>
+          </div>
+          
+          <div class="stepNav">
+            <button class="stepNavBtn" onclick="goToStep(1)">Volver al Carrito</button>
+            <button class="stepNavBtn primary" onclick="goToStep(3)">Continuar a Pago</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Payment -->
+        <div class="checkoutStep" id="step3">
+          <h4>Paso 3: Método de Pago</h4>
+          <div class="small" style="margin-bottom:8px">Selecciona cómo deseas pagar</div>
+          
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:2px solid #e6e1d3;margin-bottom:12px;font-weight:800">
+            <span>Total a Pagar:</span><span id="cartTotal2">$0,00</span>
+          </div>
+
+          <div class="paymentMethods" id="paymentMethods">
+            <label class="pmOption" data-method="visa">
+              <input type="radio" name="pm" value="visa">
+              <svg class="logosvg" viewBox="0 0 48 32"><rect rx="4" width="48" height="32" fill="#1a1f71"/><text x="24" y="21" text-anchor="middle" fill="#fff" font-size="14" font-family="Poppins">VISA</text></svg>
+              <div class="small">Visa</div>
+            </label>
+
+            <label class="pmOption" data-method="mastercard">
+              <input type="radio" name="pm" value="mastercard">
+              <svg class="logosvg" viewBox="0 0 48 32"><rect width="48" height="32" fill="#000"/><circle cx="19" cy="16" r="9" fill="#ff5f00"/><circle cx="29" cy="16" r="9" fill="#eb001b"/></svg>
+              <div class="small">Mastercard</div>
+            </label>
+
+            <label class="pmOption" data-method="paypal">
+              <input type="radio" name="pm" value="paypal">
+              <svg class="logosvg" viewBox="0 0 48 32"><rect width="48" height="32" fill="#003087"/><text x="24" y="21" text-anchor="middle" fill="#fff" font-size="12" font-family="Poppins">PayPal</text></svg>
+              <div class="small">PayPal</div>
+            </label>
+            
+            <label class="pmOption" data-method="pse">
+              <input type="radio" name="pm" value="pse">
+              <svg class="logosvg" viewBox="0 0 48 32"><rect width="48" height="32" fill="#00A650"/><text x="24" y="21" text-anchor="middle" fill="#fff" font-size="14" font-family="Poppins" font-weight="700">PSE</text></svg>
+              <div class="small">PSE</div>
+            </label>
+            
+            <label class="pmOption" data-method="nequi">
+              <input type="radio" name="pm" value="nequi">
+              <svg class="logosvg" viewBox="0 0 48 32"><rect width="48" height="32" fill="#4D12A8"/><text x="24" y="21" text-anchor="middle" fill="#fff" font-size="12" font-family="Poppins" font-weight="700">Nequi</text></svg>
+              <div class="small">Nequi</div>
+            </label>
+          </div>
+
+          <div class="payForm" id="payForm">
+            <div id="cardFields" style="display:none;margin-top:8px">
+              <label>Número de tarjeta</label>
+              <input id="cardNumber" placeholder="XXXX XXXX XXXX XXXX">
+              <div class="payRow" style="margin-top:8px">
+                <div class="formCol">
+                  <label>Mes / Año</label>
+                  <input id="cardExp" placeholder="MM/AA">
+                </div>
+                <div class="formCol">
+                  <label>CVV</label>
+                  <input id="cardCvv" placeholder="123">
+                </div>
+              </div>
+              <label style="margin-top:8px">Nombre en la tarjeta</label>
+              <input id="cardName" placeholder="Nombre completo">
+            </div>
+
+            <div id="paypalFields" style="display:none;margin-top:8px">
+              <label>Correo PayPal</label>
+              <input id="paypalEmail" placeholder="email@ejemplo.com">
+            </div>
+            
+            <div id="pseFields" style="display:none;margin-top:8px">
+              <label>Banco</label>
+              <select id="pseBank">
+                <option value="">Seleccionar banco...</option>
+                <option>Bancolombia</option>
+                <option>Banco de Bogotá</option>
+                <option>Davivienda</option>
+                <option>BBVA Colombia</option>
+                <option>Banco Popular</option>
+                <option>Scotiabank Colpatria</option>
+              </select>
+              <label style="margin-top:8px">Tipo de persona</label>
+              <select id="psePersonType">
+                <option>Natural</option>
+                <option>Jurídica</option>
+              </select>
+            </div>
+            
+            <div id="nequiFields" style="display:none;margin-top:8px">
+              <label>Número de celular Nequi</label>
+              <input id="nequiPhone" placeholder="300 123 4567" type="tel">
+            </div>
+
+            <button class="checkoutBtn" onclick="simulatePayment()">Pagar Ahora</button>
+          </div>
+          
+          <div class="stepNav" style="margin-top:12px">
+            <button class="stepNavBtn" onclick="goToStep(2)">Volver a Envío</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<div class="floatAdd" id="floatAdd">Añadido</div>
+
+<footer>
+  © Maison Paws • Prototipo — los datos se guardan localmente
+</footer>
+
+<script>
+/* Helpers */
+function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function load(k,def){const t=localStorage.getItem(k);return t?JSON.parse(t):def}
+
+/* Format COP with thousands '.' and ',00' */
+function formatCOP(n){
+  const rounded = Math.round(n);
+  const s = rounded.toString();
+  let out = '';
+  let cnt = 0;
+  for(let i = s.length - 1; i >= 0; i--){
+    out = s[i] + out;
+    cnt++;
+    if(cnt % 3 === 0 && i !== 0) out = '.' + out;
+  }
+  return '$' + out + ',00';
+}
+
+/* Navigation */
+function showSection(id){
+  document.querySelectorAll('main section').forEach(s=>s.style.display='none');
+  document.getElementById(id).style.display='block';
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  if(id==='home') document.getElementById('nav-home').classList.add('active');
+  if(id==='appointments') document.getElementById('nav-appt').classList.add('active');
+  if(id==='shop') document.getElementById('nav-shop').classList.add('active');
+  if(id==='about') document.getElementById('nav-about').classList.add('active');
+  if(id==='shop') openCartPanel();
+  
+  // Mostrar/ocultar video en home, about (nosotros) y appointments (citas)
+  const videoBg = document.getElementById('videoBackground');
+  if(id === 'home' || id === 'about' || id === 'appointments'){
+    videoBg.style.display = 'block';
+  } else {
+    videoBg.style.display = 'none';
+  }
+}
+
+/* Cart toggle */
+let cartVisible = true;
+const cartPanelEl = document.getElementById('cartPanel');
+const cartToggleEl = document.getElementById('cartToggle');
+const floatAdd = document.getElementById('floatAdd');
+
+
+// NUEVO: definir la burbuja de total de forma segura (puede no existir)
+const cartTotalBubbleEl = document.getElementById('cartTotalBubble');
+// Timers para feedback de botones Agregar
+const addBtnTimers = new WeakMap();
+
+function toggleCart(){ cartVisible = !cartVisible; cartPanelEl.style.display = cartVisible ? 'block' : 'none'; }
+function openCartPanel(){ cartPanelEl.style.display = 'block'; cartVisible = true; }
+
+/* Appointments: relative time helper */
+function timeAgo(timestamp){
+  const now = new Date();
+  const then = new Date(timestamp);
+  const diff = Math.floor((now - then)/1000); // seconds
+  if(diff < 60) return `Hace ${diff} ${diff===1?'segundo':'segundos'}`;
+  const mins = Math.floor(diff/60);
+  if(mins < 60) return `Hace ${mins} ${mins===1?'minuto':'minutos'}`;
+  const hours = Math.floor(mins/60);
+  if(hours < 24) return `Hace ${hours} ${hours===1?'hora':'horas'}`;
+  const days = Math.floor(hours/24);
+  return `Hace ${days} ${days===1?'día':'días'}`;
+}
+
+/* Appointments data */
+let appointments = load('mp_appointments',[]);
+
+const petPhotos = {
+  "Perro":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhAuv6m8VEdcDFXVeGW5o8gDAmyka01EB1PA&s",
+  "Gato":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlJKj_UXYTxw2EhsDlju2w_E4770zQt0L_Lg&s",
+  "Conejo":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3db8sD89Q0St5hE_uLV5l23Y3dKoQ2rLh-Q&s",
+  "Ave":"https://i.ytimg.com/vi/Oi0aWYU-xik/maxresdefault.jpg",
+  "Pez":"https://images.unsplash.com/photo-1526406915892-8af1f1a5d1aa?w=400&q=60&auto=format&fit=crop",
+  "Otros":"https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?w=400&q=60&auto=format&fit=crop"
+};
+
+const apptForm = document.getElementById('appointmentForm');
+apptForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  const appt = {
+    id: 'A'+Date.now(),
+    owner: document.getElementById('ownerName').value.trim(),
+    pet: document.getElementById('petName').value.trim(),
+    type: document.getElementById('petType').value,
+    service: document.getElementById('serviceType').value,
+    date: document.getElementById('apptDate').value,
+    time: document.getElementById('apptTime').value,
+    notes: document.getElementById('notes').value.trim(),
+    createdAt: new Date().toISOString(),
+    photo: petPhotos[document.getElementById('petType').value] || petPhotos['Otros']
+  };
+
+  // validate date/time
+  const dt = appt.date && appt.time ? new Date(appt.date + 'T' + appt.time) : null;
+  if(dt && dt < new Date()){
+    if(!confirm('La fecha/hora seleccionada está en el pasado. ¿Guardar igual?')) return;
+  }
+
+  appointments.push(appt);
+  save('mp_appointments', appointments);
+  renderAppointments();
+  apptForm.reset();
+  // Mostrar popup de cita registrada
+  createAppointmentPopup({
+    petType: appt.type,
+    petImg: appt.photo,
+    client: appt.owner || 'Cliente',
+    timeStr: 'recién registrado'
+  });
+  alert('Cita guardada ✅');
+});
+
+function renderAppointments(){
+  const list = document.getElementById('appointmentsList');
+  list.innerHTML = '';
+  if(!appointments.length){ list.innerHTML = '<div class="small">No hay citas guardadas.</div>'; return; }
+  // show newest first
+  appointments.slice().reverse().forEach(a=>{
+    const div = document.createElement('div');
+    div.className = 'appCard';
+    div.innerHTML = `
+      <img src="${a.photo}" alt="${a.type}">
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong style="font-size:15px">${a.pet}</strong> <div style="font-size:13px;color:var(--muted)">${a.type}</div></div>
+          <div style="font-size:12px;color:var(--muted)">${timeAgo(a.createdAt)}</div>
+        </div>
+        <div style="color:var(--muted);font-size:13px;margin-top:6px">${a.service} — ${a.date} ${a.time}</div>
+        <div style="font-size:13px;margin-top:6px;color:var(--muted)">Dueño: <strong>${a.owner}</strong></div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+renderAppointments();
+
+/* Products and Cart (24 products updated) */
+const SHOW_SHOP_BADGE = false; // se desactiva el banner global (ahora por producto)
+const SHOP_BADGE_TEXT = 'Producto Popular';
+const POPULAR_MIN_DISCOUNT = 20; // % mínimo de descuento para ser popular
+const POPULAR_BADGE_ICON = 'Videos/popular.png'; // reemplaza por tu imagen
+function IS_POPULAR(prod){
+  return (typeof prod.popular === 'boolean' ? prod.popular : false) || (prod.discount && prod.discount >= POPULAR_MIN_DISCOUNT);
+}
+const PRODUCTS = [
+  {id:'p01',cat:'Alimentos',name:'Croquetas Premium 5kg',price:85000,discount:15,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHePOvEfXHP7DcpsxyDdd1hrlqP52vf5CBng&s'},
+  {id:'p02',cat:'Alimentos',name:'Comida húmeda 400g',price:7200,discount:0,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOUxoDvsfoKGXI60PYLoWMPruKPqqb_V3X6g&s'},
+  {id:'p03',cat:'Alimentos',name:'Snacks dentales',price:12000,discount:10,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1ZuO9EDPs0muYbE_uLV5l23Y3dKoQ2rLh-Q&s'},
+  {id:'p04',cat:'Accesorios',name:'Collar de piel',price:45000,discount:20,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrdPz4t7JhEpBktPqtx_OgSFvKIuNg0Uxb9g&s'},
+  {id:'p05',cat:'Accesorios',name:'Correa retráctil',price:38000,discount:0,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3EJip0DuLdNsWdbILSI7e7AwHh6y8qgdgHw&s'},
+  {id:'p06',cat:'Accesorios',name:'Cama ortopédica',price:120000,discount:25,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr9dygXynQPFumbrUR5P1D9YRnob_LCnx6ow&s'},
+  {id:'p07',cat:'Juguetes',name:'Pelota sonora',price:8000,discount:0,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6HuO2GRR4B0azTLR0ap8uWAEXetO6doihqQ&s'},
+  {id:'p08',cat:'Juguetes',name:'Cuerda resistente',price:9000,discount:0,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpXCkScjjtMWx7v0DD8ysnp5PKiTI2Af47cg&s'},
+  {id:'p09',cat:'Juguetes',name:'Ratón de tela',price:5500,discount:0,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFfjjbbYVP9cMzlt2Wjcz0OAYJV-r976bObA&s'},
+  {id:'p10',cat:'Higiene',name:'Shampoo hipoalergénico',price:22000,discount:0,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSglbmuO-o9tqOPFreB5tbwOFkYfLCtOTH1Q&s'},
+  {id:'p11',cat:'Higiene',name:'Toallas húmedas',price:7000,discount:0,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShY0KcrVaptIlgJI1VrdrWzpd1fOaEm36u0A&s'},
+  {id:'p12',cat:'Higiene',name:'Cepillo desenredante',price:18000,discount:15,img:'https://districo.b-cdn.net/wp-content/uploads/2021/03/CEPILLO-FLEXIBLE-B.png.webp'},
+  {id:'p13',cat:'Higiene',name:'Cortaúñas profesional',price:10000,discount:0,img:'https://www.masglo.com/cdn/shop/products/corta_unas.jpg?v=1752255527'},
+  {id:'p14',cat:'Ropa',name:'Suéter térmico',price:42000,discount:30,img:'https://img.kwcdn.com/product/Fancyalgo/VirtualModelMatting/ffe4c491c3c7d36937c1def7074472ed.jpg?imageMogr2/auto-orient%7CimageView2/2/w/800/q/70/format/webp'},
+  {id:'p15',cat:'Ropa',name:'Impermeable ligero',price:65000,discount:0,img:'https://http2.mlstatic.com/D_NQ_NP_796126-MCO90273590323_082025-O.webp'},
+  {id:'p16',cat:'Ropa',name:'Botitas antideslizantes',price:32000,discount:20,img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_p8kHSFD_b_UMeetZl7XKZI017qFq8Bl5Qg&s'},
+  {id:'p17',cat:'Accesorios',name:'subfusil MP5 + 6 Cargadores',price:3600000,discount:0,img:'https://sherloc.unodc.org/cld/uploads/images/education/tertiary/Modules/Firearms/module_02_figure_6a.jpg'},
+  {id:'p18',cat:'Salud',name:'Suplemento piel y pelo',price:48000,discount:0,img:'https://cocoromeo.com/cdn/shop/files/Capturadepantalla2024-01-03ala_s_3.43.40p.m._800x.png?v=1704314696'},
+  {id:'p19',cat:'Salud',name:'Multivitamínicos',price:35000,discount:10,img:'https://www.agrocampo.com.co/media/catalog/product/cache/d51e0dc10c379a6229d70d752fc46d83/5/8/5858658605860001742-min.jpg'},
+  {id:'p20',cat:'Juguetes',name:'Puzzle alimenticio',price:29000,discount:0,img:'https://image.made-in-china.com/202f0j00OoPbkdJFPBcE/Puzzle-Dog-Food-Bowl-for-Dishes-to-Slow-Down-Eating.webp'},
+  {id:'p21',cat:'Alimentos',name:'Bolsas porciones 1kg',price:22000,discount:0,img:'https://www.wuufu.com.co/cdn/shop/files/46_ed453446-735d-487b-9994-a1ea97715400.webp?v=1743102831'},
+  {id:'p22',cat:'Accesorios',name:'Gafas de sol mascota',price:14000,discount:0,img:'https://m.media-amazon.com/images/I/71cIynM-y7S.jpg'},
+  {id:'p23',cat:'Higiene',name:'Spray desodorante',price:12000,discount:30,img:'https://http2.mlstatic.com/D_Q_NP_773697-MLA95508870107_102025-O.webp'},
+  {id:'p24',cat:'Accesorios',name:'Identificador con placa',price:9000,discount:0,img:'https://http2.mlstatic.com/D_NQ_NP_904168-MCO94037454016_102025-O.webp'},
+];
+
+let cart = load('mp_cart',{}); // { productId: qty }
+
+/* Helper para calcular precio final con descuento */
+function finalPrice(prod){
+  if(!prod.discount || prod.discount === 0) return prod.price;
+  return Math.round(prod.price * (1 - prod.discount/100));
+}
+
+/* Render categories */
+let currentCat = 'Todos';
+function renderCategories(){
+  const bar = document.getElementById('catButtons');
+  const cats = ['Todos', ...Array.from(new Set(PRODUCTS.map(p=>p.cat)))];
+  bar.innerHTML = '';
+  cats.forEach(c=>{
+    const btn = document.createElement('button');
+    btn.textContent = c;
+    btn.onclick = ()=>{ currentCat = c; renderProducts(); renderCategories(); };
+    btn.style.background = c===currentCat ? 'linear-gradient(90deg,#cda15d,#edd3a0)' : '#fff';
+    btn.style.color = c===currentCat ? '#1f1a12' : '#3b2b2b';
+    btn.style.border = '1.5px solid ' + (c===currentCat ? '#cda15d' : '#e6e1d3');
+    btn.style.borderRadius = '8px';
+    btn.style.padding = '8px 18px';
+    btn.style.fontWeight = '700';
+    btn.style.fontFamily = '"Poppins",sans-serif';
+    btn.style.fontSize = '15px';
+    btn.style.marginRight = '8px';
+    btn.style.cursor = 'pointer';
+    btn.style.transition = 'all .18s cubic-bezier(.2,.9,.2,1)';
+    btn.onmouseover = ()=>{
+      if(c!==currentCat){
+        btn.style.background='linear-gradient(90deg,#cda15d,#edd3a0)';
+        btn.style.borderColor='#cda15d';
+        btn.style.color='#1f1a12';
+        btn.style.boxShadow='0 4px 12px var(--shadow)';
+      }
+    };
+    btn.onmouseout = ()=>{
+      if(c!==currentCat){
+        btn.style.background='#fff';
+        btn.style.borderColor='#e6e1d3';
+        btn.style.color='#3b2b2b';
+        btn.style.boxShadow='none';
+      }
+    };
+    bar.appendChild(btn);
+  });
+}
+
+/* Render product cards con descuentos */
+let searchTerm = '';
+
+document.getElementById('searchInput').addEventListener('input', function(){
+  searchTerm = this.value.trim().toLowerCase();
+  renderProducts();
+});
+
+function renderProducts(){
+  const grid = document.getElementById('productsGrid');
+  const badge = document.getElementById('shopBadge');
+  if(badge){
+    if(SHOW_SHOP_BADGE){
+      badge.style.display = 'block';
+      badge.textContent = SHOP_BADGE_TEXT;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+  grid.innerHTML = '';
+  let visible = PRODUCTS.filter(p => currentCat === 'Todos' || p.cat === currentCat);
+  if(searchTerm){
+    visible = visible.filter(p =>
+      p.name.toLowerCase().includes(searchTerm) ||
+      p.cat.toLowerCase().includes(searchTerm)
+    );
+  }
+  if(visible.length === 0){
+    grid.innerHTML = '<div class="small" style="padding:18px;text-align:center;color:var(--muted)">No se encontraron productos.</div>';
+    return;
+  }
+  
+  visible.forEach(p=>{
+    const fp = finalPrice(p);
+    const hasDiscount = p.discount && p.discount > 0;
+    const badgeHTML = IS_POPULAR(p) ? `
+      <div class="popularBadge">
+        <img class="popularWarn" alt="Aviso" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'><circle cx='12' cy='12' r='11' fill='%23000'/><rect x='11' y='5' width='2' height='9' fill='%23fff'/><circle cx='12' cy='17' r='1.5' fill='%23fff'/></svg>">
+        ${SHOP_BADGE_TEXT}
+        <div class="popularSparkles">
+          <span class="sparkle"></span>
+          <span class="sparkle"></span>
+          <span class="sparkle"></span>
+        </div>
+      </div>
+    ` : '';
+    
+    const priceHTML = hasDiscount
+      ? `<div class="priceWrap">
+           <span class="discountTag">-${p.discount}%</span>
+           <div class="priceStack">
+             <span class="oldPrice">${formatCOP(p.price)}</span>
+             <span class="finalPrice">${formatCOP(fp)}</span>
+           </div>
+         </div>`
+      : `<div class="finalPrice">${formatCOP(p.price)}</div>`;
+    
+    function genDesc(name){
+      const n = name.toLowerCase();
+      if(n.includes('croquetas')||n.includes('alimentos')||n.includes('comida')||n.includes('bolsas')) return 'Alimento de calidad para una dieta equilibrada.';
+      if(n.includes('húmeda')||n.includes('humeda')) return 'Textura suave y sabrosa para paladares exigentes.';
+      if(n.includes('snacks')||n.includes('dentales')) return 'Snack funcional que ayuda a la higiene dental diaria.';
+      if(n.includes('collar')) return 'Accesorio resistente y cómodo para paseos seguros.';
+      if(n.includes('correa')) return 'Control confiable con diseño práctico para el día a día.';
+      if(n.includes('cama')) return 'Descanso superior con soporte y confort ortopédico.';
+      if(n.includes('pelota')||n.includes('juguete')) return 'Diversión activa para mantenerlo entretenido y feliz.';
+      if(n.includes('cuerda')) return 'Juego interactivo que fortalece vínculo y energía.';
+      if(n.includes('ratón')||n.includes('raton')) return 'Estimula el instinto natural de caza en gatos.';
+      if(n.includes('shampoo')||n.includes('higiene')||n.includes('spray')) return 'Cuidado higiénico suave para piel y pelaje saludable.';
+      if(n.includes('toallas')) return 'Limpieza rápida y delicada entre sesiones de grooming.';
+      if(n.includes('cepillo')) return 'Reduce nudos y mejora el brillo del pelaje.';
+      if(n.includes('corta')||n.includes('uña')||n.includes('uñas')) return 'Herramienta segura para mantenimiento de uñas.';
+      if(n.includes('suéter')||n.includes('sueter')||n.includes('térmico')) return 'Abrigado y ligero para climas fríos.';
+      if(n.includes('impermeable')) return 'Protección contra lluvia con libertad de movimiento.';
+      if(n.includes('botitas')||n.includes('botas')) return 'Agarre antideslizante para patas protegidas.';
+      if(n.includes('suplemento')||n.includes('multivitam')) return 'Apoyo nutricional para piel, pelo y vitalidad.';
+      if(n.includes('puzzle')||n.includes('alimenticio')) return 'Estimulación mental que promueve comer más despacio.';
+      if(n.includes('gafas')) return 'Estilo y protección ocular para exteriores.';
+      if(n.includes('identificador')||n.includes('placa')) return 'Identificación clara para seguridad en salidas.';
+      return 'Producto seleccionado para bienestar y comodidad diaria.';
+    }
+
+    function escHTML(s){
+      return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    const card = document.createElement('div');
+    card.className = 'productCard' + (IS_POPULAR(p) ? ' popular' : '');
+    const descText = (p.desc && p.desc.trim()) ? p.desc.trim() : genDesc(p.name);
+    card.innerHTML = `
+      ${badgeHTML}
+      <div style="display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:6px">
+        <img class="productImg" src="${p.img}" alt="${p.name}">
+      </div>
+      <div style="flex:1">
+        <div class="productTitle">${p.name}</div>
+        <div class="productDesc">${escHTML(descText)}</div>
+        ${priceHTML}
+      </div>
+      <div class="productActions">
+        <input type="number" class="qtyInput" data-id="${p.id}" value="1" min="1" max="50">
+        <button class="addBtn" data-id="${p.id}">Agregar</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  document.querySelectorAll('.addBtn').forEach(b=>{
+    b.onclick = ()=>{
+      const id = b.getAttribute('data-id');
+      const qtyInput = document.querySelector(`.qtyInput[data-id="${id}"]`);
+      const qty = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
+      addToCartAnimated(id, b, qty);
+    }
+  });
+}
+
+function addToCartAnimated(productId, btn, qty = 1){
+  cart[productId] = (cart[productId]||0) + qty;
+  save('mp_cart', cart);
+  renderCart();
+
+  // Feedback robusto: evitar que el texto se quede pegado
+  const prev = btn.getAttribute('data-prev-text') || btn.textContent;
+  btn.setAttribute('data-prev-text', prev);
+  btn.disabled = true;
+  btn.classList.add('added');
+  btn.textContent = 'Añadido';
+  if(addBtnTimers.has(btn)){
+    clearTimeout(addBtnTimers.get(btn));
+  }
+  const t = setTimeout(()=>{
+    btn.classList.remove('added');
+    btn.textContent = btn.getAttribute('data-prev-text') || 'Agregar';
+    btn.disabled = false;
+    addBtnTimers.delete(btn);
+  }, 1200);
+  addBtnTimers.set(btn, t);
+}
+
+/* Cart panel */
+const IVA_RATE = 0.19;
+const SHIPPING_COST = 12000;
+
+function getCartTotals(){
+  let subtotal = 0;
+  Object.keys(cart).forEach(id=>{
+    const qty = cart[id];
+    const prod = PRODUCTS.find(p=> String(p.id) === String(id));
+    if(!prod) return;
+    const priceU = finalPrice(prod);
+    subtotal += priceU * qty;
+  });
+  const iva = subtotal * IVA_RATE;
+  const total = subtotal + iva + SHIPPING_COST;
+  return { subtotal, iva, total };
+}
+
+function updateCartTotalBubble(show=true){
+  if(!cartTotalBubbleEl) return; // si no existe, no rompe el script
+  const { total } = getCartTotals();
+  cartTotalBubbleEl.textContent = formatCOP(total);
+  if(show){
+    cartTotalBubbleEl.style.display = 'inline-block';
+    setTimeout(()=>{ cartTotalBubbleEl.style.display = 'none'; }, 2500);
+  }
+}
+
+/* Render Cart */
+let cartExpanded = false;
+function renderCart(){
+  const list = document.getElementById('cartList');
+  const countEl = document.getElementById('cartCount');
+  const toggleBtn = document.getElementById('cartToggleBtn');
+  if(!list) return;
+  list.innerHTML = '';
+  let subtotal = 0;
+  let totalSavings = 0;
+  let totalCount = 0;
+  const entries = Object.keys(cart);
+  
+  entries.forEach((id, index)=>{
+    const qty = cart[id];
+    const prod = PRODUCTS.find(p=> String(p.id) === String(id));
+    if(!prod) return;
+
+    const priceU = finalPrice(prod);
+    subtotal += priceU * qty;
+    totalCount += qty;
+    
+    // Calculate savings
+    if(prod.discount && prod.discount > 0){
+      const originalPrice = prod.price * qty;
+      const discountedPrice = priceU * qty;
+      totalSavings += (originalPrice - discountedPrice);
+    }
+
+    const row = document.createElement('div');
+    row.className = 'cartItem' + (index >= 5 && !cartExpanded ? ' hidden' : '');
+    row.innerHTML = `
+      <div style="display:flex;gap:10px;align-items:center">
+        <img src="${prod.img}" style="width:56px;height:56px;object-fit:cover;border-radius:6px">
+        <div style="font-size:13px">
+          <div style="font-weight:700">${prod.name}</div>
+          <div class="small">${formatCOP(priceU)} x ${qty}</div>
+        </div>
+      </div>
+      <div>
+        <button class="trashBtn" data-id="${id}" title="Eliminar">✕</button>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+
+  // Show/hide toggle button
+  if(toggleBtn){
+    if(entries.length > 5){
+      toggleBtn.style.display = 'block';
+      toggleBtn.textContent = cartExpanded ? 'Mostrar menos' : 'Mostrar más';
+    } else {
+      toggleBtn.style.display = 'none';
+    }
+  }
+
+  document.querySelectorAll('.trashBtn').forEach(bt=>bt.onclick = ()=>{
+    const id = bt.getAttribute('data-id');
+    delete cart[id];
+    save('mp_cart', cart);
+    renderCart();
+  });
+
+  const iva = subtotal * IVA_RATE;
+  const total = subtotal + iva + SHIPPING_COST;
+
+  document.getElementById('cartSubtotal') && (document.getElementById('cartSubtotal').textContent = formatCOP(subtotal));
+  document.getElementById('cartIVA') && (document.getElementById('cartIVA').textContent = formatCOP(iva));
+  document.getElementById('cartShipping') && (document.getElementById('cartShipping').textContent = formatCOP(SHIPPING_COST));
+  document.getElementById('cartSavings') && (document.getElementById('cartSavings').textContent = formatCOP(totalSavings));
+  document.getElementById('cartTotal') && (document.getElementById('cartTotal').textContent = formatCOP(total));
+  if(countEl) countEl.textContent = totalCount;
+
+  updateCartTotalBubble(false);
+}
+
+function toggleCartExpand(){
+  cartExpanded = !cartExpanded;
+  renderCart();
+}
+
+/* Checkout steps navigation */
+let currentStep = 1;
+function goToStep(step){
+  document.querySelectorAll('.checkoutStep').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+step).classList.add('active');
+  currentStep = step;
+  // Sync total in step 3
+  if(step === 3){
+    const total = document.getElementById('cartTotal').textContent;
+    document.getElementById('cartTotal2').textContent = total;
+  }
+}
+
+/* Payment method selection logic */
+document.getElementById('paymentMethods').addEventListener('click', e=>{
+  const target = e.target.closest('.pmOption');
+  if(!target) return;
+  document.querySelectorAll('.pmOption').forEach(el=>el.classList.remove('active'));
+  target.classList.add('active');
+  const method = target.getAttribute('data-method');
+  // show fields
+  document.getElementById('cardFields').style.display = (method==='visa' || method==='mastercard') ? 'block' : 'none';
+  document.getElementById('paypalFields').style.display = (method==='paypal') ? 'block' : 'none';
+  document.getElementById('pseFields').style.display = (method==='pse') ? 'block' : 'none';
+  document.getElementById('nequiFields').style.display = (method==='nequi') ? 'block' : 'none';
+});
+
+function getUserLocationData(){
+  return {
+    street: document.getElementById('street')?.value.trim() || '',
+    block: document.getElementById('block')?.value.trim() || '',
+    postal: document.getElementById('postalCode')?.value.trim() || '',
+    city: document.getElementById('city')?.value.trim() || '',
+    notes: document.getElementById('deliveryNotes')?.value.trim() || ''
+  };
+}
+
+
+/* Simulate payment */
+
+function simulatePayment(){
+  if(Object.keys(cart).length===0){ alert('Carrito vacío'); return; }
+  
+  // Validate shipping data
+  const street = document.getElementById('street').value.trim();
+  const city = document.getElementById('city').value.trim();
+  if(!street || !city){
+    alert('Por favor completa los datos de envío (Calle y Ciudad)');
+    goToStep(2);
+    return;
+  }
+  
+  // detect method
+  const active = document.querySelector('.pmOption.active');
+  if(!active){ alert('Selecciona un método de pago'); return; }
+  const method = active.getAttribute('data-method');
+  
+  if(method==='paypal'){
+    const email = document.getElementById('paypalEmail').value.trim();
+    if(!email){ alert('Ingrese correo de PayPal'); return; }
+  } else if(method==='visa' || method==='mastercard'){
+    const num = document.getElementById('cardNumber').value.replace(/\s+/g,'').trim();
+    const exp = document.getElementById('cardExp').value.trim();
+    const cvv = document.getElementById('cardCvv').value.trim();
+    const name = document.getElementById('cardName').value.trim();
+    if(!num || !exp || !cvv || !name){ alert('Complete los datos de la tarjeta'); return; }
+  } else if(method==='pse'){
+    const bank = document.getElementById('pseBank').value;
+    if(!bank){ alert('Selecciona tu banco PSE'); return; }
+  } else if(method==='nequi'){
+    const phone = document.getElementById('nequiPhone').value.trim();
+    if(!phone){ alert('Ingresa tu número Nequi'); return; }
+  }
+
+  // Simulate processing
+  setTimeout(()=>{
+    // Save order simple history
+    const orders = load('mp_orders',[]);
+    orders.push({id:'ORD'+Date.now(),date:new Date().toISOString(),items:cart,method});
+    save('mp_orders',orders);
+
+    // clear cart
+    cart = {};
+    save('mp_cart', cart);
+    renderCart();
+    goToStep(1);
+
+    alert('Pago completado - Gracias por elegir Maison Paws 💛');
+  },800);
+}
+
+/* Checkout button fallback */
+function checkout(){ simulatePayment(); }
+
+/* Init */
+renderCategories();
+renderProducts();
+renderCart();
+window.toggleCartExpand = toggleCartExpand;
+
+
+// Configurar velocidad del video (0.7 = 70% velocidad normal, más lento)
+const bgVideo = document.getElementById('bgVideo');
+if(bgVideo){
+  bgVideo.playbackRate = 0.7;
+  bgVideo.play().catch(()=> {
+    bgVideo.muted = true;
+    bgVideo.play();
+  });
+}
+
+/* Responsive cart: hide on small screens */
+function adjustCartForViewport(){
+  if(window.innerWidth < 900){
+    cartPanelEl.style.display = 'none';
+    cartVisible = false;
+  } else {
+    cartPanelEl.style.display = 'block';
+    cartVisible = true;
+  }
+}
+adjustCartForViewport();
+window.addEventListener('resize', adjustCartForViewport);
+
+/* Toggle from header */
+function toggleCart(){
+  cartVisible = !cartVisible;
+  cartPanelEl.style.display = cartVisible ? 'block' : 'none';
+}
+
+/* start on home */
+showSection('home');
+
+function goToShop(){
+  showSection('shop');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ===== Hero image slideshow (Home) ===== */
+(function initHeroSlideshow(){
+  const container = document.querySelector('.heroImg');
+  if(!container) return;
+  const imgA = container.querySelector('img');
+  if(!imgA) return;
+  const imgB = document.createElement('img');
+  container.appendChild(imgB);
+  imgB.classList.add('hidden');
+
+  const IMAGES = [
+    'https://images.unsplash.com/photo-1560807707-8cc77767d783?w=1200&q=85&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1200&q=85&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=1200&q=85&auto=format&fit=crop'
+  ];
+
+  let current = 0;
+  imgA.src = IMAGES[0];
+  imgB.src = IMAGES[1];
+  let front = imgA;
+  let back = imgB;
+
+  function swap(){
+    // Prepare next image in hidden back layer
+    const nextIndex = (current + 1) % IMAGES.length;
+    back.src = IMAGES[nextIndex];
+    container.classList.add('swap');
+    front.classList.add('hidden');
+    back.classList.remove('hidden');
+    current = nextIndex;
+    const tmp = front; front = back; back = tmp;
+    setTimeout(()=>container.classList.remove('swap'), 1200);
+  }
+
+  setInterval(swap, 15000);
+})();
+
+/* ===== Sistema de cuentas (localStorage) ===== */
+let currentUser = load('mp_user', null);
+let profileVisible = false;
+const profilePanelEl = document.getElementById('profilePanel');
+const avatarInitialsEl = document.getElementById('avatarInitials');
+const profileLabelEl = document.getElementById('profileLabel');
+const roleBadgeEl = document.getElementById('roleBadge');
+
+function saveUser(u){ currentUser = u; save('mp_user', u); renderProfileIcon(); renderProfilePanel(); }
+function clearUser(){ currentUser = null; save('mp_user', null); renderProfileIcon(); renderProfilePanel(); }
+
+function initialsFromName(name){
+  if(!name) return 'U';
+  const parts = name.trim().split(/\s+/);
+  const a = parts[0]?.[0] || '';
+  const b = parts[1]?.[0] || '';
+  return (a+b || a).toUpperCase();
+}
+
+function toggleProfile(){
+  profileVisible = !profileVisible;
+  profilePanelEl.style.display = profileVisible ? 'block' : 'none';
+}
+
+// REEMPLAZA la función renderProfileIcon por esta (usa imagen y evita nulls)
+function renderProfileIcon(){
+  const imgEl = document.getElementById('profileAvatarImg');
+  const labelEl = document.getElementById('profileLabel');
+  const roleBadgeEl = document.getElementById('roleBadge');
+  if(!imgEl || !labelEl || !roleBadgeEl) return;
+
+  if(currentUser){
+    const roleLabel = currentUser.role === 'admin' ? 'Admin' : 'Cliente';
+    // En el botón solo mostramos el rol
+    labelEl.textContent = '';
+    roleBadgeEl.textContent = roleLabel;
+    roleBadgeEl.className = 'roleBadge ' + (currentUser.role === 'admin' ? 'admin' : '');
+    roleBadgeEl.style.display = 'inline-block';
+    const seed = encodeURIComponent(currentUser.name);
+    imgEl.src = `https://api.dicebear.com/7.x/miniavs/svg?seed=${seed}`;
+  }else{
+    labelEl.textContent = '';
+    roleBadgeEl.textContent = 'Invitado';
+    roleBadgeEl.className = 'roleBadge';
+    roleBadgeEl.style.display = 'inline-block';
+    imgEl.src = 'https://api.dicebear.com/7.x/miniavs/svg?seed=Invitado';
+  }
+}
+
+function renderProfilePanel(){
+  if(!profilePanelEl) return;
+  if(currentUser){
+    const loginDate = new Date(currentUser.loginAt);
+    const createdDate = new Date(currentUser.createdAt || currentUser.loginAt);
+    const connectedFor = timeAgo(currentUser.loginAt);
+    const createdAtStr = createdDate.toLocaleString();
+    const seed = encodeURIComponent(currentUser.name);
+    const avatarUrl = `https://api.dicebear.com/7.x/miniavs/svg?seed=${seed}`;
+    const roleLabel = currentUser.role === 'admin' ? 'Administrador' : 'Cliente';
+    profilePanelEl.innerHTML = `
+      <div class="profileHeader">
+        <img class="profileAvatarLg" src="${avatarUrl}" alt="Avatar">
+        <div class="profileName">${currentUser.name}</div>
+        <div class="profileRole">(${roleLabel})</div>
+      </div>
+      <div style="border-top:1px solid #f0ebe2;margin:8px 0"></div>
+      <div class="profileMeta">
+        <div class="metaRow"><span>Tiempo conectado:</span><span>${connectedFor}</span></div>
+        <div class="metaRow"><span>Creación de cuenta:</span><span>${createdAtStr}</span></div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
+        <button class="logoutBtn" onclick="logoutUser()">Cerrar sesión</button>
+      </div>
+    `;
+  }else{
+    profilePanelEl.innerHTML = `
+      <h4 style="text-align:center;font-family:'Playfair Display',serif">Iniciar sesión</h4>
+      <div style="display:grid;gap:8px">
+        <label>Nombre</label>
+        <input id="loginName" placeholder="Tu nombre" />
+        <label>Rol</label>
+        <select id="loginRole">
+          <option value="cliente">Cliente</option>
+          <option value="admin">Admin</option>
+        </select>
+        <div id="adminPasswordWrap" style="display:none">
+          <label>Contraseña (solo Admin)</label>
+          <input id="loginPassword" type="password" placeholder="••••••••" />
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
+        <button class="loginBtn" onclick="loginUser()">Entrar</button>
+      </div>
+      <div class="small" style="margin-top:6px">La sesión se guarda localmente (prototipo).</div>
+    `;
+    document.getElementById('loginRole').addEventListener('change', (e)=>{
+      const wrap = document.getElementById('adminPasswordWrap');
+      wrap.style.display = e.target.value === 'admin' ? 'block' : 'none';
+    });
+  }
+}
+
+function loginUser(){
+  const name = document.getElementById('loginName').value.trim();
+  const role = document.getElementById('loginRole').value;
+  const pwdEl = document.getElementById('loginPassword');
+  const pwd = pwdEl ? pwdEl.value : '';
+  if(!name){ alert('Ingresa tu nombre'); return; }
+  if(role === 'admin'){
+    // Simple contraseña de demostración. Ajusta según necesidad.
+    const ADMIN_PASS = 'admin123';
+    if(pwd !== ADMIN_PASS){ alert('Contraseña de admin incorrecta'); return; }
+  }
+  const existing = load('mp_user_createdAt', null);
+  const createdAt = existing || new Date().toISOString();
+  save('mp_user_createdAt', createdAt);
+  saveUser({ name, role, loginAt: new Date().toISOString(), createdAt });
+  alert('Sesión iniciada');
+}
+
+function logoutUser(){
+  if(confirm('¿Cerrar sesión?')){
+    clearUser();
+    alert('Sesión cerrada');
+  }
+}
+
+// Asegura que el toggle no se cierre inmediatamente y sube z-index del panel si hiciera falta
+const profileToggleEl = document.getElementById('profileToggle');
+if(profileToggleEl){
+  profileToggleEl.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    profileVisible = !profileVisible;
+    profilePanelEl.style.display = profileVisible ? 'block' : 'none';
+  });
+}
+
+if(profilePanelEl){
+  profilePanelEl.addEventListener('click', (e)=> e.stopPropagation());
+}
+
+document.addEventListener('click', (e)=>{
+  if(!profilePanelEl || !profileVisible) return;
+  const inPanel = e.target.closest('#profilePanel');
+  const inToggle = e.target.closest('#profileToggle');
+  if(!inPanel && !inToggle){
+    profileVisible = false;
+    profilePanelEl.style.display = 'none';
+  }
+});
+
+// Inicializar perfil al cargar
+renderProfileIcon();
+renderProfilePanel();
+
+/* ===== Admin: mostrar botón + solo si rol admin ===== */
+function updateAdminFabVisibility(){
+  const fab = document.getElementById('adminFab');
+  if(!fab) return;
+  fab.style.display = (currentUser && currentUser.role === 'admin') ? 'flex' : 'none';
+}
+
+/* Abrir/cerrar modal de añadir producto */
+function openAddProduct(){
+  // solo admin
+  if(!(currentUser && currentUser.role === 'admin')){ alert('Solo administradores pueden añadir productos.'); return; }
+  document.getElementById('adminModalBack').style.display = 'flex';
+}
+function closeAddProduct(){
+  document.getElementById('adminModalBack').style.display = 'none';
+}
+
+/* Guardar nuevo producto en PRODUCTS y persistir */
+function saveNewProduct(){
+  if(!(currentUser && currentUser.role === 'admin')){ alert('Acción no permitida.'); return; }
+  const idNum = document.getElementById('ap_id').value.trim();
+  const cat = document.getElementById('ap_cat').value.trim();
+  const name = document.getElementById('ap_name').value.trim();
+  const desc = (document.getElementById('ap_desc')?.value || '').trim();
+  const priceStr = document.getElementById('ap_price').value.trim();
+  const discountStr = document.getElementById('ap_discount').value.trim();
+  const img = document.getElementById('ap_img').value.trim();
+  const popular = document.getElementById('ap_popular').checked;
+
+  if(!idNum || !cat || !name || !priceStr || !img){
+    alert('Completa ID, categoría, nombre, precio e imagen.');
+    return;
+  }
+  const id = 'p' + idNum;
+  if(PRODUCTS.some(p=>String(p.id)===String(id))){
+    alert('ID ya existe. Usa un número único.');
+    return;
+  }
+  const price = Number(priceStr);
+  const discount = Number(discountStr || 0);
+  if(isNaN(price) || price <= 0){ alert('Precio inválido.'); return; }
+  if(isNaN(discount) || discount < 0 || discount > 90){ alert('Descuento debe ser entre 0 y 90.'); return; }
+
+  const newProd = { id, cat, name, desc, price, discount, img, popular };
+  PRODUCTS.push(newProd);
+  save('mp_products', PRODUCTS);
+  const extra = load('mp_products_extra', []);
+  extra.push(newProd);
+  save('mp_products_extra', extra);
+
+  closeAddProduct();
+  renderCategories();
+  renderProducts();
+  alert('Producto añadido.');
+}
+
+(function mergePersistedProducts(){
+  const extra = load('mp_products_extra', []);
+  if(Array.isArray(extra) && extra.length){
+    const ids = new Set(PRODUCTS.map(p=>String(p.id)));
+    extra.forEach(p=>{
+      if(!ids.has(String(p.id))){
+        PRODUCTS.push(p);
+      }
+    });
+  }
+})();
+
+updateAdminFabVisibility();
+
+const _saveUser = saveUser;
+saveUser = function(u){
+  _saveUser(u);
+  updateAdminFabVisibility();
+};
+const _clearUser = clearUser;
+clearUser = function(){
+  _clearUser();
+  updateAdminFabVisibility();
+};
+/* ===== Chat Bot Nosotros (Mejorado) ===== */
+const CHAT_MEMORY_LIMIT = 8;
+let CHAT_HISTORY = []; // {role:'user'|'bot', text:''}
+
+const CHAT_INTENTS = [
+  {
+    name:'mision',
+    patterns:[/mision|misión|objetivo/i],
+    answers:[
+      "Nuestra misión es brindar bienestar integral y experiencias calmadas a cada mascota.",
+      "Buscamos que cada visita sea segura, tranquila y de alta calidad: esa es nuestra misión.",
+      "La misión: cuidado responsable + confort emocional + resultados estéticos óptimos."
+    ]
+  },
+  {
+    name:'vision',
+    patterns:[/vision|visión|futuro|meta/i],
+    answers:[
+      "Nuestra visión es ser el referente boutique de grooming y tienda especializada en la región.",
+      "Aspiramos a liderar localmente en experiencias premium para el bienestar animal.",
+      "Visión: excelencia sostenible y confianza de cada familia que nos visita."
+    ]
+  },
+  {
+    name:'valores',
+    patterns:[/valores?|principios?|ética/i],
+    answers:[
+      "Valores: amor, confianza, excelencia y responsabilidad con cada familia.",
+      "Trabajamos con empatía, profesionalismo, transparencia y respeto por cada mascota.",
+      "Nos guían el amor por los animales, la calidad y la responsabilidad."
+    ]
+  },
+  {
+    name:'servicios',
+    patterns:[/servicios?|baño|corte|spa|tratamiento|arreglo/i],
+    answers:[
+      "Servicios: Baño hipoalergénico, Corte estilizado, Spa relajante y tratamientos de piel.",
+      "Ofrecemos baño, corte profesional, spa, y asesoría básica en cuidados.",
+      "Portafolio: baño premium, estilizado, relajación y apoyo en salud superficial."
+    ]
+  },
+  {
+    name:'horario',
+    patterns:[/horario|hora|abren|cierran|abierto|abren/i],
+    answers:[
+      "Horario: Lunes a Sábado 9:00–18:00 (domingos cerrado).",
+      "Abrimos de lunes a sábado de 9 a 6. Domingos descansamos.",
+      "Atención disponible L–S de 9:00 a 18:00. Festivos cerrado."
+    ]
+  },
+  {
+    name:'ubicacion',
+    patterns:[/ubicaci|direccion|dirección|donde|mapa|local/i],
+    answers:[
+      "Estamos en Cra 7 #123-45, Bogotá. Tienes el mapa al final de la sección.",
+      "Dirección: Cra 7 #123-45, Bogotá. Puedes ver el mapa incrustado.",
+      "Ubicación física: Cra 7 #123-45 (Bogotá)."
+    ]
+  },
+  {
+    name:'productos',
+    patterns:[/productos?|tienda|precio|costos?|stock|articulos?/i],
+    answers:[
+      "La tienda incluye alimentos, higiene, accesorios, juguetes, salud y ropa; algunos con descuento.",
+      "Ofrecemos surtido variado con descuentos dinámicos en ciertos ítems.",
+      "Hay categorías como Alimentos, Accesorios, Juguetes, Higiene, Ropa y Salud."
+    ]
+  },
+  {
+    name:'citas',
+    patterns:[/citas?|agendar|reserva|appointment|turno/i],
+    answers:[
+      "Para agendar: ve a 'Agendar cita', completa datos y guarda. Se almacena localmente.",
+      "Agenda en la sección de citas: mascota, servicio, fecha y notas.",
+
+      "Puedes reservar desde la sección 'Agendar cita'."
+    ]
+  },
+  {
+    name:'contacto',
+    patterns:[/contacto|telefono|teléfono|correo|mail|whatsapp/i],
+    answers:[
+      "Tel: +57 300 123 4567 • Correo: hola@maisonpaws.co",
+      "Contacto directo: +57  300 123 4567 y hola@maisonpaws.co",
+      "Teléfono: +57 300 123 4567 / Email: hola@maisonpaws.co"
+    ]
+   },
+  {
+    name:'envio',
+    patterns:[/envio|envío|entrega|domicilio|shipping/i],
+    answers:[
+      "El envío estándar cuesta $12.000 y se suma tras calcular IVA.",
+      "Costo de envío: $12.000 (se agrega al total).",
+      "Aplicamos $12.000 de envío, más IVA sobre el subtotal."
+    ]
+  },
+  {
+    name:'filosofia',
+    patterns:[/filosof|enfoque|concepto/i],
+    answers:[
+      "Filosofía: reducir estrés, usar insumos seguros y trato humano respetuoso.",
+      "Creemos en bienestar emocional + higiene técnica + estética cuidada.",
+      "Nuestro enfoque: calma, calidad y responsabilidad."
+    ]
+  },
+  {
+    name:'agradecimiento',
+    patterns:[/gracias|thank|genial|excelente|perfecto/i],
+    answers:[
+      "¡Con gusto! ¿Algo más que quieras saber?",
+      "Siempre aquí para ayudarte. ¿Te aclaro otra cosa?",
+      "Un placer ayudarte. Pregunta lo que necesites."
+    ]
+  },
+  {
+    name:'saludo',
+    patterns:[/hola|buenas|hello|hey|saludos/i],
+    answers:[
+      "Hola 👋 ¿En qué puedo ayudarte hoy?",
+      "¡Bienvenido! Pregunta sobre servicios, misión, ubicación o tienda.",
+      "Hola, listo para responder. ¿Qué tema te interesa?"
+    ]
+  }
+];
+
+// Respuestas sugeridas cuando no hay match
+const SUGGESTIONS = [
+  "Puedes preguntar por la misión.",
+  "¿Te interesa conocer nuestros servicios?",
+  "Pregunta por horarios o ubicación.",
+  "¿Buscas información de la tienda?"
+];
+
+// Pequeño motor de coincidencia (score)
+function classifyIntent(text){
+  let best = null;
+  CHAT_INTENTS.forEach(intent=>{
+    intent.patterns.forEach(rx=>{
+      if(rx.test(text)){
+        const score = rx.source.length; // simple: longitud patrón
+        if(!best || score > best.score){
+          best = { name:intent.name, intent, score };
+        }
+      }
+    });
+  });
+  return best;
+}
+
+// Selección aleatoria estable
+function pick(arr){
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+// Generar respuesta usando contexto (último tema)
+function generateReply(userText){
+  const intentMatch = classifyIntent(userText);
+  if(intentMatch){
+    const base = pick(intentMatch.intent.answers);
+    // Añadir guiado contextual si ya se habló del mismo intent
+    const recentSame = CHAT_HISTORY.slice(-4).filter(m=>m.role==='bot' && m.intent===intentMatch.name).length;
+    const tail = recentSame > 0 ? " ¿Deseas más detalles o pasamos a otro tema?" : "";
+    return { text: base + tail, intent:intentMatch.name };
+  }
+
+  // Intentar referencia a algo previo
+  const lastIntent = [...CHAT_HISTORY].reverse().find(m=>m.role==='bot' && m.intent);
+  if(lastIntent){
+    return {
+      text: "No identifico esa pregunta. Antes hablamos de " + lastIntent.intent + ". " + pick(SUGGESTIONS),
+      intent:null
+    };
+  }
+  return {
+    text: "No estoy seguro. " + pick(SUGGESTIONS),
+    intent:null
+  };
+}
+
+function appendChat(msg, from='user', intent=null){
+  const box = document.getElementById('chatMessages');
+  if(!box) return;
+  const div = document.createElement('div');
+  div.className = 'chatMsg ' + from;
+  div.textContent = msg;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  CHAT_HISTORY.push({role:from, text:msg, intent});
+  if(CHAT_HISTORY.length > CHAT_MEMORY_LIMIT){
+    CHAT_HISTORY = CHAT_HISTORY.slice(-CHAT_MEMORY_LIMIT);
+  }
+}
+
+function sendChat(){
+  const input = document.getElementById('chatInput');
+  if(!input) return;
+  const raw = input.value;
+  const text = raw.trim();
+  if(!text) return;
+  appendChat(text,'user');
+  input.value = '';
+
+  // Indicador de "escribiendo"
+  const typingId = 'typing_indicator';
+  const box = document.getElementById('chatMessages');
+  const tip = document.createElement('div');
+  tip.className = 'chatMsg bot';
+  tip.id = typingId;
+  tip.textContent = 'Escribiendo...';
+  box.appendChild(tip);
+  box.scrollTop = box.scrollHeight;
+
+  setTimeout(()=>{
+    const replyObj = generateReply(text);
+    const ind = document.getElementById(typingId);
+    if(ind) ind.remove();
+    appendChat(replyObj.text,'bot',replyObj.intent);
+  }, 350 + Math.random()*300);
+}
+
+document.getElementById('chatInput')?.addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){ sendChat(); }
+});
+
+// Mensaje inicial (solo una vez)
+if(!window.__chatInitialized){
+  appendChat("Hola 👋 Soy el asistente mejorado de Maison Paws. Pregunta sobre misión, servicios, tienda, horarios o envíos.","bot","saludo");
+  window.__chatInitialized = true;
+}
+  /* === Purchase popups system === */
+  const PURCHASE_POPUP_CITIES = ['Bogotá','Medellín','Cali','Barranquilla','Bucaramanga','Cartagena','Manizales','Pereira','Santa Marta','Ibagué'];
+  function ensurePurchaseContainer(){
+    let el = document.getElementById('purchasePopups');
+    if(!el){
+      el = document.createElement('div');
+      el.id = 'purchasePopups';
+      el.setAttribute('aria-live','polite');
+      el.setAttribute('aria-atomic','true');
+      document.body.appendChild(el);
+    }
+    return el;
+  }
+  function schedulePurchasePopups(){
+    if(window.__purchasePopupsRunning) return;
+    window.__purchasePopupsRunning = true;
+    ensurePurchaseContainer();
+    const next = ()=>{
+      const delay = 5000 + Math.random()*15000; // 5s to 20s
+      setTimeout(()=>{ createPurchasePopup(); next(); }, delay);
+    };
+    next();
+  }
+  function createPurchasePopup(){
+    const cont = ensurePurchaseContainer();
+    if(!cont) return;
+    const city = PURCHASE_POPUP_CITIES[Math.floor(Math.random()*PURCHASE_POPUP_CITIES.length)];
+    // Build a multi-item order with increasing probability to add more items
+    const items = [];
+    const src = (PRODUCTS && PRODUCTS.length) ? PRODUCTS.slice() : [];
+    let prob = 0.25; // base chance to add another item
+    let i = 0;
+    do{
+      let p = null;
+      if(src.length){
+        p = src.splice(Math.floor(Math.random()*src.length),1)[0];
+      }
+      const name = p ? p.name : `Producto ${i+1}`;
+      const img = p ? p.img : 'https://via.placeholder.com/64x64.png?text=MP';
+      const unit = p ? finalPrice(p) : (20000 + Math.floor(Math.random()*80000));
+      const qty = 1 + Math.floor(Math.random()*3); // 1-3
+      items.push({ name, img, unit, qty });
+      i++;
+      prob = Math.min(0.85, prob + 0.12); // probability increases with count
+    } while(i < 8 && Math.random() < prob); // cap to 8 distinct items
+    const firstImg = items[0]?.img || 'https://via.placeholder.com/64x64.png?text=MP';
+    const totalCOP = items.reduce((a,b)=> a + b.unit*b.qty, 0);
+    const totalTxt = formatCOP(totalCOP);
+    // Limit the visible list to 3 items, add ellipsis if more
+    const visible = items.slice(0,3);
+    const extra = items.length - visible.length;
+    const listHtml = `<ul class=\"ppList\">${visible.map(it=>`<li>x${it.qty} ${it.name}</li>`).join('')}${extra>0?`<li>...</li>`:''}</ul>`;
+    // Gold popup if >= 3 products
+    const largeOrder = items.length >= 3;
+    // Animate existing items shifting down slightly
+    Array.from(cont.children).forEach(ch=>{
+      ch.classList.add('shiftDown');
+      setTimeout(()=> ch.classList.remove('shiftDown'), 250);
+    });
+    const el = document.createElement('div');
+    el.className = 'purchasePopup' + (largeOrder ? ' gold' : '');
+    el.innerHTML = `
+      <div class="ppInner">
+        <img src="${firstImg}" alt="Pedido">
+        <div class="ppText">
+          <div class="ppLine">Nuevo pedido en ${city}</div>
+          <div class="ppSub">${items.length} productos · ${totalTxt}</div>
+          ${listHtml}
+        </div>
+      </div>
+    `;
+    cont.insertBefore(el, cont.firstChild);
+    requestAnimationFrame(()=> el.classList.add('enter'));
+    const timeout = largeOrder ? 25000 : 5000; // 25s if >=3 products, else 5s
+    setTimeout(()=> dismissPurchasePopup(el), timeout);
+  }
+  function dismissPurchasePopup(el){
+    if(!el) return;
+    el.classList.add('exit');
+    const removeLater = ()=> el.remove();
+    el.addEventListener('transitionend', removeLater, { once:true });
+    // Fallback in case transitionend doesn't fire
+    setTimeout(()=>{ try{ el.remove(); }catch(e){} }, 800);
+  }
+  // === Appointment popups system ===
+  // Tipos de mascota y fotos coherentes con el sistema real
+  const APPOINTMENT_PET_TYPES = [
+    { type:'Perro', img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3db8sD89Q0St5hE_uLV5l23Y3dKoQ2rLh-Q&s' },
+    { type:'Gato', img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFfjjbbYVP9cMzlt2Wjcz0OAYJV-r976bObA&s' },
+    { type:'Conejo', img:'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=400&q=60&auto=format&fit=crop' },
+    { type:'Ave', img:'https://i.ytimg.com/vi/Oi0aWYU-xik/maxresdefault.jpg' },
+    { type:'Pez', img:'https://images.unsplash.com/photo-1526406915892-8af1f1a5d1aa?w=400&q=60&auto=format&fit=crop' },
+    { type:'Otros', img:'https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?w=400&q=60&auto=format&fit=crop' }
+  ];
+  function ensureAppointmentContainer(){
+    // Usar el mismo contenedor que los popups de compra
+    return ensurePurchaseContainer();
+  }
+  function scheduleAppointmentPopups(){
+    if(window.__appointmentPopupsRunning) return;
+    window.__appointmentPopupsRunning = true;
+    ensureAppointmentContainer();
+    const next = ()=>{
+      const delay = 10000 + Math.random()*10000; // 10s to 20s
+      setTimeout(()=>{ createAppointmentPopup(); next(); }, delay);
+    };
+    next();
+  }
+  function createAppointmentPopup(opts){
+    const cont = ensureAppointmentContainer();
+    if(!cont) return;
+    // Si opts viene de registro real, usar esos datos
+    let petType, petImg, client, timeStr;
+    if(opts && opts.petType){
+      petType = opts.petType;
+      // Buscar imagen real o fallback
+      petImg = opts.petImg || APPOINTMENT_PET_TYPES.find(t=>t.type===petType)?.img || APPOINTMENT_PET_TYPES[APPOINTMENT_PET_TYPES.length-1].img;
+      client = opts.client || 'Cliente';
+      timeStr = opts.timeStr || 'recién registrado';
+    }else{
+      // Aleatorio
+      const pet = APPOINTMENT_PET_TYPES[Math.floor(Math.random()*APPOINTMENT_PET_TYPES.length)];
+      petType = pet.type;
+      petImg = pet.img;
+      client = ['Juan','Ana','Carlos','Luisa','Pedro','Sofía','Camila','Mateo','Valentina','Andrés'][Math.floor(Math.random()*10)];
+      timeStr = 'hace un momento';
+    }
+    // Animar desplazamiento de los existentes
+    Array.from(cont.children).forEach(ch=>{
+      ch.classList.add('shiftDown');
+      setTimeout(()=> ch.classList.remove('shiftDown'), 250);
+    });
+    const el = document.createElement('div');
+    el.className = 'appointmentPopup';
+    el.innerHTML = `
+      <div class="apInner">
+        <img src="${petImg}" alt="${petType}">
+        <div class="apText">
+          <div class="apLine">Cita para ${petType}</div>
+          <div class="apSub">${client} · ${timeStr}</div>
+        </div>
+      </div>
+    `;
+    cont.insertBefore(el, cont.firstChild);
+    requestAnimationFrame(()=> el.classList.add('enter'));
+    setTimeout(()=> dismissAppointmentPopup(el), 12000);
+  }
+  function dismissAppointmentPopup(el){
+    if(!el) return;
+    el.classList.add('exit');
+    const removeLater = ()=> el.remove();
+    el.addEventListener('transitionend', removeLater, { once:true });
+    setTimeout(()=>{ try{ el.remove(); }catch(e){} }, 800);
+  }
+  // Iniciar popups de citas automáticos
+  scheduleAppointmentPopups();
+  // Start the popup cycle
+  schedulePurchasePopups();
+// === Ruleta de imágenes dinámicas en inicio ===
+const ROULETTE_IMAGES = [
+  'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=800&q=80&auto=format&fit=crop',
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJzUJB5Gd4j4rdsbHrdWHeoXwBnwwO4lBbGw&s',
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-YqE5iu_GaPi-66uZ4KNcdHzdy_4DfPMZtcjV35wzXxrCZ1x4dxzoKTBoAWRE3Sh2LEM&usqp=CAU',
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShpkGi7hITgChtXzz-d2hKEn575SGEu6QxEE7M6UwbENBxQQAdMh6cwVChkHNGy4UN2Xs&usqp=CAU',
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTY0HJ9j-F99R22kAa5aOKXtO_elZcM5q5hMw&s',
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDgDMPY8IFKMPBCbhWUR503Zn4V70Hf7X0ig&s'
+];
+let rouletteIndex = 0;
+function renderImageRoulette(){
+  const cont = document.getElementById('imageRoulette');
+  if(!cont) return;
+  cont.innerHTML = '';
+  const left = (rouletteIndex-1+ROULETTE_IMAGES.length)%ROULETTE_IMAGES.length;
+  const center = rouletteIndex;
+  const right = (rouletteIndex+1)%ROULETTE_IMAGES.length;
+  // Left
+  const imgL = document.createElement('img');
+  imgL.src = ROULETTE_IMAGES[left];
+  imgL.className = 'rouletteImg left';
+  cont.appendChild(imgL);
+  // Center
+  const imgC = document.createElement('img');
+  imgC.src = ROULETTE_IMAGES[center];
+  imgC.className = 'rouletteImg center';
+  cont.appendChild(imgC);
+  // Right
+  const imgR = document.createElement('img');
+  imgR.src = ROULETTE_IMAGES[right];
+  imgR.className = 'rouletteImg right';
+  cont.appendChild(imgR);
+}
+function nextRouletteImage(){
+  rouletteIndex = (rouletteIndex+1)%ROULETTE_IMAGES.length;
+  renderImageRoulette();
+}
+setInterval(nextRouletteImage, 10000);
+document.addEventListener('DOMContentLoaded', renderImageRoulette);
+</script>
+<!-- Left-side purchase popups container (injected if missing) -->
+<div id="purchasePopups" aria-live="polite" aria-atomic="true"></div>
+<div id="appointmentPopups" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
