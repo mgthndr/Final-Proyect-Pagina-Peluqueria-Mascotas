@@ -97,8 +97,6 @@
 
 (Enlace directo → [Ver Capturas](#-capturas-de-pantalla))
 
-> Reemplaza las imágenes con tus propias capturas
-
 ### 🏠 Home
 
 <img width="1344" height="604" alt="peluquera1" src="https://github.com/user-attachments/assets/6683d039-fc5d-4a7b-8e41-ad5553fb8212" />
