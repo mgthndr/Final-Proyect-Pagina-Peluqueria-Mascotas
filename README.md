@@ -16,6 +16,15 @@
 
 ---
 
+# ⏺️ **Integrantes del Equipo**
+
+- Samuel Garcia Fuquen
+- Juan Jose Castañeda Correa
+- Santiago Certuche Gaviria
+- Karla Castrillón Tobón
+
+---
+
 # 📚 **Tabla de Contenidos**
 
 * ➤ [Características Principales](#-características-principales)
