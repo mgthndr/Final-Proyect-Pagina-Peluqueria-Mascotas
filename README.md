@@ -16,7 +16,7 @@
 
 ---
 
-# ⏺️ **Integrantes del Equipo**
+# ⏺️ **Integrantes del Proyecto**
 
 - Samuel Garcia Fuquen
 - Juan Jose Castañeda Correa
